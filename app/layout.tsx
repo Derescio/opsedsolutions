@@ -1,4 +1,5 @@
 import type React from "react"
+import { Toaster } from "@/components/ui/sonner"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
@@ -37,6 +38,11 @@ export default function RootLayout({
           <Navbar />
           {children}
         </ThemeProvider>
+        <Toaster
+          position="top-center"
+          richColors
+          duration={3000}
+        />
       </body>
     </html>
   )

@@ -3,27 +3,30 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { Mail, Phone, MapPin, Clock, Send, MessageSquare, Calendar, Linkedin } from "lucide-react"
+import { Mail, MapPin, Clock, Send, MessageSquare, Calendar } from "lucide-react"
+import { sendEmail } from "@/lib/actions/email-sender"
+import { useState } from "react"
+import { toast } from "sonner"
 
 const contactInfo = [
   {
     icon: Mail,
     label: "Email",
-    value: "hello@opsedsolutions.com",
-    href: "mailto:hello@opsedsolutions.com",
+    value: "opsedsolutions@gmail.com",
+    href: "mailto:opsedsolutions@gmail.com",
     color: "#0376aa"
   },
-  {
-    icon: Phone,
-    label: "Phone",
-    value: "+1 (555) 123-4567",
-    href: "tel:+15551234567",
-    color: "#32cf37"
-  },
+  // {
+  //   icon: Phone,
+  //   label: "Phone",
+  //   value: "+1 (555) 123-4567",
+  //   href: "tel:+15551234567",
+  //   color: "#32cf37"
+  // },
   {
     icon: MapPin,
     label: "Location",
-    value: "Remote & On-site Available",
+    value: "Remote Work",
     href: null,
     color: "#0376aa"
   },
@@ -48,6 +51,30 @@ const services = [
 ]
 
 export default function Contact() {
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const handleSubmit = async (formData: FormData) => {
+    setIsSubmitting(true)
+
+    try {
+      const result = await sendEmail(formData)
+      if (result.success) {
+        toast.success("Message sent successfully! I'll get back to you within 24 hours.")
+        // Reset form fields manually
+        const form = document.querySelector('form') as HTMLFormElement
+        if (form) {
+          form.reset()
+        }
+      } else {
+        toast.error("Failed to send message. Please try again or email me directly.")
+      }
+    } catch (error) {
+      toast.error("Failed to send message. Please try again or email me directly." + error)
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
   return (
     <section id="contact" className="py-20 px-4 bg-white dark:bg-gray-800">
       <div className="max-w-7xl mx-auto">
@@ -118,7 +145,7 @@ export default function Contact() {
             </Card>
 
             {/* Social Links */}
-            <Card className="bg-gradient-to-r from-[#0376aa] to-[#32cf37] text-white border-0">
+            {/* <Card className="bg-gradient-to-r from-[#0376aa] to-[#32cf37] text-white border-0">
               <CardContent className="p-8 text-center">
                 <h3 className="text-xl font-bold mb-4">Connect With Me</h3>
                 <div className="flex justify-center space-x-4">
@@ -145,7 +172,7 @@ export default function Contact() {
                   </a>
                 </div>
               </CardContent>
-            </Card>
+            </Card> */}
           </div>
 
           {/* Contact Form */}
@@ -153,7 +180,7 @@ export default function Contact() {
             <Card className="bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 shadow-lg">
               <CardContent className="p-8">
                 <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Start Your Project</h3>
-                <form className="space-y-6">
+                <form action={handleSubmit} className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -161,6 +188,7 @@ export default function Contact() {
                       </label>
                       <Input
                         id="firstName"
+                        name="firstName"
                         type="text"
                         required
                         className="w-full bg-gray-50 dark:bg-gray-600 border-gray-300 dark:border-gray-500 text-gray-900 dark:text-white"
@@ -173,6 +201,7 @@ export default function Contact() {
                       </label>
                       <Input
                         id="lastName"
+                        name="lastName"
                         type="text"
                         required
                         className="w-full bg-gray-50 dark:bg-gray-600 border-gray-300 dark:border-gray-500 text-gray-900 dark:text-white"
@@ -188,6 +217,7 @@ export default function Contact() {
                       </label>
                       <Input
                         id="email"
+                        name="email"
                         type="email"
                         required
                         className="w-full bg-gray-50 dark:bg-gray-600 border-gray-300 dark:border-gray-500 text-gray-900 dark:text-white"
@@ -200,6 +230,7 @@ export default function Contact() {
                       </label>
                       <Input
                         id="company"
+                        name="company"
                         type="text"
                         className="w-full bg-gray-50 dark:bg-gray-600 border-gray-300 dark:border-gray-500 text-gray-900 dark:text-white"
                         placeholder="Your Company"
@@ -213,13 +244,12 @@ export default function Contact() {
                     </label>
                     <select
                       id="projectType"
+                      name="projectType"
                       className="w-full p-3 bg-gray-50 dark:bg-gray-600 border border-gray-300 dark:border-gray-500 rounded-lg text-gray-900 dark:text-white focus:ring-2 focus:ring-[#0376aa] focus:border-transparent"
                     >
                       <option value="">Select a service</option>
                       <option value="web-development">Web Application Development</option>
                       <option value="data-analytics">Data Analytics & BI</option>
-                      <option value="system-optimization">System Optimization</option>
-                      <option value="consulting">Technical Consulting</option>
                       <option value="other">Other</option>
                     </select>
                   </div>
@@ -230,9 +260,11 @@ export default function Contact() {
                     </label>
                     <select
                       id="budget"
+                      name="budget"
                       className="w-full p-3 bg-gray-50 dark:bg-gray-600 border border-gray-300 dark:border-gray-500 rounded-lg text-gray-900 dark:text-white focus:ring-2 focus:ring-[#0376aa] focus:border-transparent"
                     >
                       <option value="">Select budget range</option>
+                      <option value="1k-5k">$1,000 - $5,000</option>
                       <option value="5k-15k">$5,000 - $15,000</option>
                       <option value="15k-50k">$15,000 - $50,000</option>
                       <option value="50k-100k">$50,000 - $100,000</option>
@@ -246,6 +278,7 @@ export default function Contact() {
                     </label>
                     <Textarea
                       id="message"
+                      name="message"
                       required
                       rows={6}
                       className="w-full bg-gray-50 dark:bg-gray-600 border-gray-300 dark:border-gray-500 text-gray-900 dark:text-white"
@@ -256,10 +289,11 @@ export default function Contact() {
                   <div className="flex flex-col sm:flex-row gap-4">
                     <Button
                       type="submit"
-                      className="flex-1 bg-[#0376aa] hover:bg-[#025a8a] text-white py-3 px-6 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg flex items-center justify-center"
+                      disabled={isSubmitting}
+                      className="flex-1 bg-[#0376aa] hover:bg-[#025a8a] disabled:bg-gray-400 text-white py-3 px-6 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg flex items-center justify-center"
                     >
                       <Send className="w-4 h-4 mr-2" />
-                      Send Message
+                      {isSubmitting ? 'Sending...' : 'Send Message'}
                     </Button>
                     <Button
                       type="button"
@@ -270,11 +304,13 @@ export default function Contact() {
                       Schedule Call
                     </Button>
                   </div>
+
+
                 </form>
 
                 <div className="mt-8 p-4 bg-gray-50 dark:bg-gray-600 rounded-lg">
                   <p className="text-sm text-gray-600 dark:text-gray-300 text-center">
-                    <strong>Quick Response Guarantee:</strong> I&apos;ll get back to you within 24 hours with a detailed project proposal and next steps.
+                    <strong>Quick Response Guarantee:</strong> I&apos;ll get back to you within 24-48 hours with a draft proposal and next steps.
                   </p>
                 </div>
               </CardContent>

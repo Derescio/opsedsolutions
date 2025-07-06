@@ -1,7 +1,7 @@
 'use client'
 import Image from "next/image"
 import Link from "next/link"
-import { Mail, Phone, MapPin, Linkedin, Github, Twitter, ArrowUp } from "lucide-react"
+import { Mail, MapPin, Linkedin, Github, Twitter, ArrowUp } from "lucide-react"
 
 const footerLinks = {
     services: [
@@ -52,8 +52,7 @@ export default function Footer() {
                             />
                         </Link>
                         <p className="text-gray-300 mb-6 max-w-md leading-relaxed">
-                            Optimizing systems for enterprise development. We combine full-stack development expertise
-                            with advanced data analytics to create solutions that drive real business growth.
+                            Technology helps web applications scale and meet enterprise demands. Big data integration further enhances growth and scalability.
                         </p>
 
                         {/* Contact Info */}
@@ -61,18 +60,18 @@ export default function Footer() {
                             <div className="flex items-center space-x-3">
                                 <Mail className="w-4 h-4 text-[#0376aa]" />
                                 <a href="mailto:hello@opsedsolutions.com" className="text-gray-300 hover:text-white transition-colors">
-                                    hello@opsedsolutions.com
+                                    ddw.web.dev.services@gmail.com
                                 </a>
                             </div>
-                            <div className="flex items-center space-x-3">
+                            {/* <div className="flex items-center space-x-3">
                                 <Phone className="w-4 h-4 text-[#32cf37]" />
                                 <a href="tel:+15551234567" className="text-gray-300 hover:text-white transition-colors">
                                     +1 (555) 123-4567
                                 </a>
-                            </div>
+                            </div> */}
                             <div className="flex items-center space-x-3">
                                 <MapPin className="w-4 h-4 text-[#0376aa]" />
-                                <span className="text-gray-300">Remote & On-site Available</span>
+                                <span className="text-gray-300">Remote Work</span>
                             </div>
                         </div>
                     </div>
@@ -130,7 +129,7 @@ export default function Footer() {
                 </div>
 
                 {/* Newsletter Signup */}
-                <div className="mt-12 pt-8 border-t border-gray-800">
+                {/* <div className="mt-12 pt-8 border-t border-gray-800">
                     <div className="max-w-md">
                         <h3 className="text-lg font-semibold mb-4 text-white">Stay Updated</h3>
                         <p className="text-gray-300 mb-4">
@@ -147,7 +146,7 @@ export default function Footer() {
                             </button>
                         </div>
                     </div>
-                </div>
+                </div> */}
             </div>
 
             {/* Bottom Bar */}
