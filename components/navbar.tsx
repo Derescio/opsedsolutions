@@ -2,6 +2,7 @@
 import React from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { Button } from "@/components/ui/button"
 import { Menu, X } from "lucide-react"
 import { useState } from 'react'
@@ -9,17 +10,36 @@ import { ModeToggle } from "@/components/mode-toggle"
 
 const Navbar = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false)
+    const pathname = usePathname()
+    const isHomepage = pathname === '/'
 
-    const navItems = [
-        { name: 'Home', href: '#home' },
-        { name: 'Services', href: '#services' },
-        { name: 'Projects', href: '#projects' },
-        { name: 'About', href: '#about' },
-        { name: 'Contact', href: '#contact' },
+    // Smart navigation: anchor links on homepage, page links elsewhere
+    const getNavItems = () => [
+        { name: 'Home', href: '/' },
+        {
+            name: 'Projects',
+            href: isHomepage ? '#projects' : '/projects'
+        },
+        {
+            name: 'Services',
+            href: isHomepage ? '#services' : '/services'
+        },
+        {
+            name: 'About',
+            href: isHomepage ? '#about' : '/about'
+        },
+        { name: 'Blog', href: '/blog' },
+        // { name: 'Studio', href: '/studio' },
+        {
+            name: 'Contact',
+            href: isHomepage ? '#contact' : '/#contact'
+        },
     ]
 
+    const navItems = getNavItems()
+
     return (
-        <nav className="fixed top-0 w-full bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700 z-50 shadow-sm">
+        <nav className="fixed top-0 w-full bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700 z-50 shadow-sm ">
             <div className='container mx-auto flex justify-between items-center px-4 py-3'>
                 {/* Logo */}
                 <Link href="/" >

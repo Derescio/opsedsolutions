@@ -9,9 +9,9 @@ export default function Hero() {
 
   const metrics = [
     { label: "Apps Built with Next.js", value: "25+", icon: Code },
-    { label: "Databases Managed (PostgreSQL)", value: "30+", icon: Database },
-    { label: "Interfaces Designed in Figma", value: "60+", icon: LayoutDashboard },
-    { label: "Dashboards Delivered in Power BI", value: "20+", icon: BarChart3 },
+    { label: "PostgreSQL Databases", value: "30+", icon: Database },
+    { label: "Figma Designs", value: "60+", icon: LayoutDashboard },
+    { label: "Power BI Dashboards", value: "20+", icon: BarChart3 },
   ];
 
 

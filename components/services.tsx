@@ -14,6 +14,7 @@ import {
     CheckCircle,
     ArrowRight
 } from "lucide-react"
+import Link from "next/link"
 
 const services = [
     {
@@ -230,22 +231,26 @@ export default function Services() {
                                 Let&apos;s discuss how our full-stack development and data analytics expertise can drive your next project to success.
                             </p>
                             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-6">
-                                <Button
-                                    size="lg"
-                                    variant="secondary"
-                                    className="bg-white text-[#0376aa] hover:bg-gray-100 px-8 py-3"
-                                    onClick={() => document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" })}
-                                >
-                                    Start Your Project
-                                </Button>
-                                <Button
-                                    size="lg"
-                                    variant="outline"
-                                    className="border-white text-white hover:bg-white hover:text-[#0376aa] px-8 py-3"
-                                    onClick={() => document.getElementById("projects")?.scrollIntoView({ behavior: "smooth" })}
-                                >
-                                    View Our Work
-                                </Button>
+                                <Link href="/contact">
+                                    <Button
+                                        size="lg"
+                                        variant="secondary"
+                                        className="bg-white text-[#0376aa] hover:bg-gray-100 px-8 py-3"
+                                    //onClick={() => document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" })}
+                                    >
+                                        Start Your Project
+                                    </Button>
+                                </Link>
+                                <Link href="/projects">
+                                    <Button
+                                        size="lg"
+                                        variant="outline"
+                                        className="border-white text-white hover:bg-white hover:text-[#0376aa] px-8 py-3"
+                                    //onClick={() => document.getElementById("projects")?.scrollIntoView({ behavior: "smooth" })}
+                                    >
+                                        View Our Work
+                                    </Button>
+                                </Link>
                             </div>
                         </CardContent>
                     </Card>

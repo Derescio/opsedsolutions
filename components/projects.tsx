@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { ExternalLink, BarChart3, Code, Database, TrendingUp, Users, ShoppingCart, Calendar, LucideIcon } from "lucide-react"
 import Image from "next/image"
 import { useState } from "react"
+import Link from "next/link"
 
 interface ProjectMetrics {
   [key: string]: string
@@ -307,20 +308,24 @@ export default function Projects() {
               Let&apos;s discuss your project requirements and create a solution that drives real business results.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button
-                size="lg"
-                className="bg-[#0376aa] hover:bg-[#025a8a] text-white px-6 sm:px-8 py-3"
-                onClick={() => document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" })}
-              >
-                Start Your Project
-              </Button>
-              <Button
-                variant="outline"
-                size="lg"
-                className="border-[#32cf37] text-[#32cf37] hover:bg-[#32cf37] hover:text-white px-6 sm:px-8 py-3 dark:border-[#32cf37] dark:text-[#32cf37]"
-              >
-                View All Projects
-              </Button>
+              <Link href="/contact">
+                <Button
+                  size="lg"
+                  className="bg-[#0376aa] hover:bg-[#025a8a] text-white px-6 sm:px-8 py-3"
+                //onClick={() => document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" })}
+                >
+                  Start Your Project
+                </Button>
+              </Link>
+              <Link href="/projects">
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="border-[#32cf37] text-[#32cf37] hover:bg-[#32cf37] hover:text-white px-6 sm:px-8 py-3 dark:border-[#32cf37] dark:text-[#32cf37]"
+                >
+                  View All Projects
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
