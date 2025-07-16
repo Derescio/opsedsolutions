@@ -243,16 +243,16 @@ export default function TicketDetail({ ticket, currentUserRole }: { ticket: Tick
             {/* Ticket Header */}
             <Card>
                 <CardHeader>
-                    <div className="flex items-start justify-between">
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                         <div className="flex-1">
                             <div className="flex items-center gap-2 mb-2">
                                 {categoryIcons[ticket.category as keyof typeof categoryIcons]}
-                                <CardTitle className="text-xl">{ticket.title}</CardTitle>
+                                <CardTitle className="text-lg sm:text-xl">{ticket.title}</CardTitle>
                             </div>
                             <p className="text-gray-600 dark:text-gray-400 mb-4">
                                 {ticket.description}
                             </p>
-                            <div className="flex items-center gap-4">
+                            <div className="flex flex-wrap items-center gap-3 sm:gap-4">
                                 <div className="flex items-center gap-2">
                                     <User className="w-4 h-4 text-gray-500" />
                                     <span className="text-sm text-gray-600 dark:text-gray-400">
@@ -267,7 +267,7 @@ export default function TicketDetail({ ticket, currentUserRole }: { ticket: Tick
                                 </div>
                             </div>
                         </div>
-                        <div className="flex flex-col gap-2">
+                        <div className="flex sm:flex-col gap-2 justify-start sm:justify-end">
                             <Badge className={statusOptions.find(s => s.value === ticket.status)?.color}>
                                 {ticket.status.replace('_', ' ')}
                             </Badge>
@@ -281,8 +281,8 @@ export default function TicketDetail({ ticket, currentUserRole }: { ticket: Tick
                 {/* Admin/Support Controls */}
                 {isAdminOrSupport && (
                     <CardContent className="border-t pt-4">
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-4">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
                                 <span className="text-sm font-medium">Assigned to:</span>
                                 {ticket.assignedTo ? (
                                     <span className="text-sm">
@@ -292,7 +292,7 @@ export default function TicketDetail({ ticket, currentUserRole }: { ticket: Tick
                                     <span className="text-sm text-gray-500">Unassigned</span>
                                 )}
                             </div>
-                            <div className="flex items-center gap-2">
+                            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
                                 <Button
                                     variant="outline"
                                     size="sm"
@@ -300,33 +300,37 @@ export default function TicketDetail({ ticket, currentUserRole }: { ticket: Tick
                                         setShowAssignment(!showAssignment)
                                         if (!showAssignment) loadSupportUsers()
                                     }}
+                                    className="w-full sm:w-auto"
                                 >
                                     <UserCheck className="w-4 h-4 mr-1" />
                                     {ticket.assignedTo ? 'Reassign' : 'Assign'}
                                 </Button>
 
-                                {/* Status Update */}
-                                <select
-                                    value={newStatus}
-                                    onChange={(e) => setNewStatus(e.target.value as TicketStatus)}
-                                    className="border border-gray-300 dark:border-gray-600 rounded-md px-3 py-1 text-sm"
-                                >
-                                    {statusOptions.map(option => (
-                                        <option key={option.value} value={option.value}>
-                                            {option.label}
-                                        </option>
-                                    ))}
-                                </select>
-
-                                {newStatus !== ticket.status && (
-                                    <Button
-                                        size="sm"
-                                        onClick={handleStatusUpdate}
-                                        disabled={isUpdatingStatus}
+                                <div className="flex items-center gap-2 w-full sm:w-auto">
+                                    {/* Status Update */}
+                                    <select
+                                        value={newStatus}
+                                        onChange={(e) => setNewStatus(e.target.value as TicketStatus)}
+                                        className="flex-1 sm:flex-none border border-gray-300 dark:border-gray-600 rounded-md px-3 py-1 text-sm"
                                     >
-                                        {isUpdatingStatus ? 'Updating...' : 'Update Status'}
-                                    </Button>
-                                )}
+                                        {statusOptions.map(option => (
+                                            <option key={option.value} value={option.value}>
+                                                {option.label}
+                                            </option>
+                                        ))}
+                                    </select>
+
+                                    {newStatus !== ticket.status && (
+                                        <Button
+                                            size="sm"
+                                            onClick={handleStatusUpdate}
+                                            disabled={isUpdatingStatus}
+                                            className="whitespace-nowrap"
+                                        >
+                                            {isUpdatingStatus ? 'Updating...' : 'Update Status'}
+                                        </Button>
+                                    )}
+                                </div>
                             </div>
                         </div>
 

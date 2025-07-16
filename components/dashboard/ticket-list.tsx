@@ -181,8 +181,8 @@ export default function TicketList({ tickets, isAdmin = false, onAssignTicket, o
                         <Link key={ticket.id} href={`/ticket/${ticket.id}`}>
                             <Card className="hover:shadow-md transition-shadow cursor-pointer">
                                 <CardContent className="p-4">
-                                    <div className="flex items-start justify-between">
-                                        <div className="flex items-start gap-3 flex-1">
+                                    <div className="flex flex-col space-y-3">
+                                        <div className="flex items-start gap-3">
                                             <div className="mt-1">
                                                 {getCategoryIcon(ticket.category)}
                                             </div>
@@ -193,10 +193,10 @@ export default function TicketList({ tickets, isAdmin = false, onAssignTicket, o
                                                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-2 line-clamp-2">
                                                     {ticket.description}
                                                 </p>
-                                                <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-500">
+                                                <div className="flex flex-wrap items-center gap-3 text-xs text-gray-500 dark:text-gray-500">
                                                     <div className="flex items-center gap-1">
                                                         <User className="w-3 h-3" />
-                                                        {ticket.createdBy.firstName} {ticket.createdBy.lastName}
+                                                        <span className="truncate">{ticket.createdBy.firstName} {ticket.createdBy.lastName}</span>
                                                     </div>
                                                     <div className="flex items-center gap-1">
                                                         <Calendar className="w-3 h-3" />
@@ -205,13 +205,13 @@ export default function TicketList({ tickets, isAdmin = false, onAssignTicket, o
                                                     {ticket.assignedTo && (
                                                         <div className="flex items-center gap-1">
                                                             <span>Assigned to:</span>
-                                                            {ticket.assignedTo.firstName} {ticket.assignedTo.lastName}
+                                                            <span className="truncate">{ticket.assignedTo.firstName} {ticket.assignedTo.lastName}</span>
                                                         </div>
                                                     )}
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className="flex items-center gap-2 ml-4">
+                                        <div className="flex items-center gap-2 justify-start">
                                             <Badge className={getPriorityColor(ticket.priority)}>
                                                 {ticket.priority}
                                             </Badge>

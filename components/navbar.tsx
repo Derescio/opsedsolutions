@@ -108,7 +108,7 @@ const Navbar = () => {
                     />
 
                     {/* Side Drawer */}
-                    <div className="fixed top-0 left-0 h-screen w-80 z-50 md:hidden transform transition-transform duration-300 ease-in-out">
+                    <div className="fixed top-0 left-0 h-screen w-80 z-40 md:hidden transform transition-transform duration-300 ease-in-out">
                         <div className="h-full bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 shadow-2xl flex flex-col">
                             {/* Drawer Header */}
                             <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
@@ -161,8 +161,8 @@ const Navbar = () => {
                                 </div>
 
                                 {/* Authentication Button */}
-                                <div className="pt-4">
-                                    <div onClick={() => setIsMenuOpen(false)}>
+                                <div className="pt-4 relative z-50">
+                                    <div onClick={() => setIsMenuOpen(false)} className="relative">
                                         <AuthButton />
                                     </div>
                                 </div>

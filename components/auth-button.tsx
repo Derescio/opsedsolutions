@@ -4,7 +4,7 @@ import { useAuth, useUser, SignedIn, SignedOut, UserButton } from '@clerk/nextjs
 import { Button } from '@/components/ui/button'
 import { LogIn, UserPlus, Settings } from 'lucide-react'
 import Link from 'next/link'
-import { Badge } from '@/components/ui/badge'
+//import { Badge } from '@/components/ui/badge'
 
 export default function AuthButton() {
     const { isSignedIn } = useAuth()
@@ -20,19 +20,21 @@ export default function AuthButton() {
                     appearance={{
                         elements: {
                             avatarBox: "w-8 h-8",
-                            userButtonPopoverCard: "bg-background border-border",
+                            userButtonPopoverCard: "bg-background border-border z-[9999]",
                             userButtonPopoverActionButton: "text-foreground hover:bg-accent",
                             userButtonPopoverActionButtonText: "text-foreground",
                             userButtonPopoverFooter: "hidden",
                             userPreviewTextContainer: "text-foreground",
                             userPreviewSecondaryIdentifier: "text-muted-foreground",
                             userButtonPopoverMain: "bg-background",
+                            userButtonPopoverActions: "bg-background",
+                            userButtonPopover: "z-[9999]",
                         }
                     }}
                     userProfileProps={{
                         appearance: {
                             elements: {
-                                rootBox: "bg-background",
+                                rootBox: "bg-background z-[9999]",
                                 card: "bg-background border-border",
                                 headerTitle: "text-foreground",
                                 headerSubtitle: "text-muted-foreground",
