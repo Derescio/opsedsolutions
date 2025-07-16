@@ -4,11 +4,12 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "npx prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
     "studio": "sanity dev",
-    "seed-blog": "node scripts/seed-blog-data.js"
+    "seed-blog": "node scripts/seed-blog-data.js",
+    "postinstall": "npx prisma generate"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.25.1",
