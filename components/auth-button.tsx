@@ -20,17 +20,17 @@ export default function AuthButton() {
                     appearance={{
                         elements: {
                             avatarBox: "w-8 h-8",
-                            userButtonPopoverCard: "bg-background border-border z-[9999]",
-                            userButtonPopoverActionButton: "text-foreground hover:bg-accent flex items-center gap-2",
-                            userButtonPopoverActionButtonText: "text-foreground",
-                            userButtonPopoverActionButtonIcon: "text-foreground w-4 h-4",
+                            userButtonPopoverCard: "bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 z-[9999]",
+                            userButtonPopoverActionButton: "text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 px-3 py-2",
+                            userButtonPopoverActionButtonText: "text-gray-900 dark:text-gray-100 font-medium text-sm",
+                            userButtonPopoverActionButtonIcon: "text-gray-900 dark:text-gray-100 w-4 h-4",
                             userButtonPopoverFooter: "hidden",
-                            userPreviewTextContainer: "text-foreground",
-                            userPreviewSecondaryIdentifier: "text-muted-foreground",
-                            userButtonPopoverMain: "bg-background",
-                            userButtonPopoverActions: "bg-background",
+                            userPreviewTextContainer: "text-gray-900 dark:text-gray-100",
+                            userPreviewSecondaryIdentifier: "text-gray-600 dark:text-gray-400",
+                            userButtonPopoverMain: "bg-white dark:bg-gray-800",
+                            userButtonPopoverActions: "bg-white dark:bg-gray-800",
                             userButtonPopover: "z-[9999]",
-                            userButtonPopoverActionButtonIconBox: "text-foreground",
+                            userButtonPopoverActionButtonIconBox: "text-gray-900 dark:text-gray-100",
                         }
                     }}
                     userProfileProps={{
