@@ -21,14 +21,16 @@ export default function AuthButton() {
                         elements: {
                             avatarBox: "w-8 h-8",
                             userButtonPopoverCard: "bg-background border-border z-[9999]",
-                            userButtonPopoverActionButton: "text-foreground hover:bg-accent",
+                            userButtonPopoverActionButton: "text-foreground hover:bg-accent flex items-center gap-2",
                             userButtonPopoverActionButtonText: "text-foreground",
+                            userButtonPopoverActionButtonIcon: "text-foreground w-4 h-4",
                             userButtonPopoverFooter: "hidden",
                             userPreviewTextContainer: "text-foreground",
                             userPreviewSecondaryIdentifier: "text-muted-foreground",
                             userButtonPopoverMain: "bg-background",
                             userButtonPopoverActions: "bg-background",
                             userButtonPopover: "z-[9999]",
+                            userButtonPopoverActionButtonIconBox: "text-foreground",
                         }
                     }}
                     userProfileProps={{

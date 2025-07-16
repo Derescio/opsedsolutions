@@ -162,9 +162,7 @@ const Navbar = () => {
 
                                 {/* Authentication Button */}
                                 <div className="pt-4 relative z-50">
-                                    <div onClick={() => setIsMenuOpen(false)} className="relative">
-                                        <AuthButton />
-                                    </div>
+                                    <AuthButton />
                                 </div>
                             </div>
                         </div>
