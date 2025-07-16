@@ -25,7 +25,7 @@ export default function AuthButton() {
                             userButtonPopoverActionButtonText: "text-gray-900 dark:text-gray-100 font-medium text-sm",
                             userButtonPopoverActionButtonIcon: "text-gray-900 dark:text-gray-100 w-4 h-4",
                             userButtonPopoverFooter: "hidden",
-                            userPreviewTextContainer: "text-gray-900 dark:text-gray-100",
+                            userPreviewTextContainer: "bg-whitetext-gray-900 dark:text-gray-100",
                             userPreviewSecondaryIdentifier: "text-gray-600 dark:text-gray-400",
                             userButtonPopoverMain: "bg-white dark:bg-gray-800",
                             userButtonPopoverActions: "bg-white dark:bg-gray-800",
