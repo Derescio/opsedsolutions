@@ -1,0 +1,182 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Enums for better type safety and consistency
+enum UserRole {
+  ADMIN
+  CLIENT
+  SUPPORT
+  MODERATOR
+}
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+  CANCELLED
+}
+
+enum TicketPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum TicketCategory {
+  TECHNICAL
+  BILLING
+  GENERAL
+  FEATURE_REQUEST
+  BUG_REPORT
+  PROJECT_SETUP
+}
+
+enum UpdateType {
+  COMMENT
+  STATUS_CHANGE
+  PRIORITY_CHANGE
+  ASSIGNMENT
+  INTERNAL_NOTE
+}
+
+// User model - integrates with Clerk authentication
+model User {
+  id        String   @id @default(cuid())
+  clerkId   String   @unique // Clerk user ID
+  email     String   @unique
+  firstName String?
+  lastName  String?
+  imageUrl  String?
+  phone     String?
+  role      UserRole @default(CLIENT)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relationships
+  ticketsCreated  Ticket[]       @relation("TicketCreator")
+  ticketsAssigned Ticket[]       @relation("TicketAssignee")
+  ticketUpdates   TicketUpdate[]
+  sessions        Session[]
+  Attachment      Attachment[]
+
+  @@map("users")
+}
+
+// Role definitions (if you need more granular permissions)
+model Role {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  permissions Json? // Store permissions as JSON
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("roles")
+}
+
+// Main ticket model
+model Ticket {
+  id          String         @id @default(cuid())
+  title       String
+  description String
+  status      TicketStatus   @default(OPEN)
+  priority    TicketPriority @default(MEDIUM)
+  category    TicketCategory @default(GENERAL)
+
+  // User relationships
+  createdById String
+  createdBy   User   @relation("TicketCreator", fields: [createdById], references: [id])
+
+  assignedToId String?
+  assignedTo   User?   @relation("TicketAssignee", fields: [assignedToId], references: [id])
+
+  // Metadata
+  isResolved Boolean   @default(false)
+  resolvedAt DateTime?
+  closedAt   DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  // Relationships
+  updates TicketUpdate[]
+
+  @@map("tickets")
+}
+
+// Ticket updates (comments, status changes, notes)
+model TicketUpdate {
+  id       String     @id @default(cuid())
+  ticketId String
+  userId   String
+  type     UpdateType @default(COMMENT)
+  content  String
+
+  // For status/priority changes
+  oldValue String?
+  newValue String?
+
+  // Internal notes (only visible to admins/support)
+  isInternal Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relationships
+  ticket      Ticket       @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  user        User         @relation(fields: [userId], references: [id])
+  attachments Attachment[]
+
+  @@map("ticket_updates")
+}
+
+// Attachment model for file uploads
+model Attachment {
+  id             String   @id @default(cuid())
+  filename       String
+  originalName   String
+  url            String
+  fileType       String
+  fileSize       Int
+  uploadedById   String
+  ticketUpdateId String
+  createdAt      DateTime @default(now())
+
+  // Relationships
+  uploadedBy   User         @relation(fields: [uploadedById], references: [id])
+  ticketUpdate TicketUpdate @relation(fields: [ticketUpdateId], references: [id], onDelete: Cascade)
+
+  @@map("attachments")
+}
+
+// Session model for enhanced auth tracking (optional - Clerk handles most of this)
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  // Relationships
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+// Indexes for better performance
+// These will be created automatically by Prisma

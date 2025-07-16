@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Menu, X } from "lucide-react"
 import { useState } from 'react'
 import { ModeToggle } from "@/components/mode-toggle"
+import AuthButton from "@/components/auth-button"
 
 const Navbar = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -76,11 +77,7 @@ const Navbar = () => {
                     ))}
                     <div className="flex items-center space-x-3">
                         <ModeToggle />
-                        <Button
-                            className="bg-[#0376aa] hover:bg-[#025a8a] text-white px-6 py-2 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg"
-                        >
-                            Get Started
-                        </Button>
+                        <AuthButton />
                     </div>
                 </div>
 
@@ -163,14 +160,11 @@ const Navbar = () => {
                                     </div>
                                 </div>
 
-                                {/* CTA Button */}
+                                {/* Authentication Button */}
                                 <div className="pt-4">
-                                    <Button
-                                        className="w-full bg-[#0376aa] hover:bg-[#025a8a] text-white py-3 rounded-lg transition-all duration-200 text-lg"
-                                        onClick={() => setIsMenuOpen(false)}
-                                    >
-                                        Get Started
-                                    </Button>
+                                    <div onClick={() => setIsMenuOpen(false)}>
+                                        <AuthButton />
+                                    </div>
                                 </div>
                             </div>
                         </div>

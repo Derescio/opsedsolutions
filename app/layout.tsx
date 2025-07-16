@@ -6,6 +6,7 @@ import "./globals.css"
 import ConditionalNavbar from "@/components/conditional-navbar"
 import { ThemeProvider } from "@/components/theme-provider"
 import ConditionalFooter from "@/components/conditional-footer"
+import { ClerkProvider } from '@clerk/nextjs'
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -28,24 +29,26 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className="scroll-smooth" suppressHydrationWarning>
-      <body className={`${inter.className} overflow-x-hidden`}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <ConditionalNavbar />
-          {children}
-          <ConditionalFooter />
-        </ThemeProvider>
-        <Toaster
-          position="top-center"
-          richColors
-          duration={3000}
-        />
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="en" className="scroll-smooth" suppressHydrationWarning>
+        <body className={`${inter.className} overflow-x-hidden`}>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="dark"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <ConditionalNavbar />
+            {children}
+            <ConditionalFooter />
+          </ThemeProvider>
+          <Toaster
+            position="top-center"
+            richColors
+            duration={3000}
+          />
+        </body>
+      </html>
+    </ClerkProvider>
   )
 }
