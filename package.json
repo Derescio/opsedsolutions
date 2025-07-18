@@ -9,6 +9,7 @@
     "lint": "next lint",
     "studio": "sanity dev",
     "seed-blog": "node scripts/seed-blog-data.js",
+    "setup-stripe": "node scripts/setup-stripe-products.js",
     "postinstall": "npx prisma generate"
   },
   "dependencies": {
@@ -22,9 +23,11 @@
     "@sanity/color-input": "^4.0.4",
     "@sanity/image-url": "^1.1.0",
     "@sanity/vision": "^3.99.0",
+    "@stripe/stripe-js": "^7.4.0",
     "@uploadthing/react": "^7.3.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "dotenv": "^17.2.0",
     "lucide-react": "^0.511.0",
     "next": "15.3.2",
     "next-sanity": "^9.12.2",
@@ -35,6 +38,7 @@
     "react-dom": "^19.0.0",
     "react-hot-toast": "^2.5.2",
     "sonner": "^2.0.6",
+    "stripe": "^18.3.0",
     "svix": "^1.69.0",
     "tailwind-merge": "^3.3.0",
     "uploadthing": "^7.7.3"

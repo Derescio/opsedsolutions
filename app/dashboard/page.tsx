@@ -8,7 +8,10 @@ import {
     Settings,
     BarChart3,
     Plus,
-    Shield
+    Shield,
+    CreditCard,
+    FileText,
+    DollarSign
 } from 'lucide-react'
 import { redirect } from 'next/navigation'
 import { db } from '@/lib/db'
@@ -17,6 +20,10 @@ import Profile from '@/components/dashboard/profile'
 import CreateTicket from '@/components/dashboard/create-ticket'
 import TicketList from '@/components/dashboard/ticket-list'
 import UserRoleManager from '@/components/admin/user-role-manager'
+import ClientBilling from '@/components/dashboard/client-billing'
+import ClientInvoices from '@/components/dashboard/client-invoices'
+import AdminBillingOverview from '@/components/dashboard/admin-billing-overview'
+import AdminCustomerBilling from '@/components/dashboard/admin-customer-billing'
 
 export default async function DashboardPage() {
     const user = await getCurrentUser()
@@ -74,7 +81,7 @@ export default async function DashboardPage() {
 
                     {/* Role-based Dashboard Tabs */}
                     <Tabs defaultValue="profile" className="w-full">
-                        <TabsList className="grid w-full grid-cols-2 lg:grid-cols-5 mb-8">
+                        <TabsList className="grid w-full grid-cols-2 lg:grid-cols-6 gap-2">
                             <TabsTrigger value="profile" className="flex items-center gap-2">
                                 <User className="w-4 h-4" />
                                 Profile
@@ -82,6 +89,14 @@ export default async function DashboardPage() {
 
                             {user.role === 'ADMIN' ? (
                                 <>
+                                    <TabsTrigger value="billing-overview" className="flex items-center gap-2">
+                                        <DollarSign className="w-4 h-4" />
+                                        Billing Overview
+                                    </TabsTrigger>
+                                    <TabsTrigger value="customer-billing" className="flex items-center gap-2">
+                                        <CreditCard className="w-4 h-4" />
+                                        Customer Billing
+                                    </TabsTrigger>
                                     <TabsTrigger value="users" className="flex items-center gap-2">
                                         <Users className="w-4 h-4" />
                                         Users
@@ -94,13 +109,17 @@ export default async function DashboardPage() {
                                         <BarChart3 className="w-4 h-4" />
                                         Reports
                                     </TabsTrigger>
-                                    <TabsTrigger value="settings" className="flex items-center gap-2">
-                                        <Settings className="w-4 h-4" />
-                                        Settings
-                                    </TabsTrigger>
                                 </>
                             ) : (
                                 <>
+                                    <TabsTrigger value="billing" className="flex items-center gap-2">
+                                        <CreditCard className="w-4 h-4" />
+                                        Billing
+                                    </TabsTrigger>
+                                    <TabsTrigger value="invoices" className="flex items-center gap-2">
+                                        <FileText className="w-4 h-4" />
+                                        Invoices
+                                    </TabsTrigger>
                                     <TabsTrigger value="my-tickets" className="flex items-center gap-2">
                                         <Ticket className="w-4 h-4" />
                                         My Tickets
@@ -125,6 +144,14 @@ export default async function DashboardPage() {
                         {/* Admin-specific tabs */}
                         {user.role === 'ADMIN' && (
                             <>
+                                <TabsContent value="billing-overview" className="mt-6">
+                                    <AdminBillingOverview />
+                                </TabsContent>
+
+                                <TabsContent value="customer-billing" className="mt-6">
+                                    <AdminCustomerBilling />
+                                </TabsContent>
+
                                 <TabsContent value="users" className="mt-6">
                                     <div className="space-y-6">
                                         <Card>
@@ -211,7 +238,7 @@ export default async function DashboardPage() {
                                                 Reports & Analytics
                                             </CardTitle>
                                             <CardDescription>
-                                                System reports and analytics
+                                                View system reports and analytics
                                             </CardDescription>
                                         </CardHeader>
                                         <CardContent>
@@ -227,37 +254,20 @@ export default async function DashboardPage() {
                                         </CardContent>
                                     </Card>
                                 </TabsContent>
-
-                                <TabsContent value="settings" className="mt-6">
-                                    <Card>
-                                        <CardHeader>
-                                            <CardTitle className="flex items-center gap-2">
-                                                <Settings className="w-5 h-5" />
-                                                System Settings
-                                            </CardTitle>
-                                            <CardDescription>
-                                                Manage system-wide settings
-                                            </CardDescription>
-                                        </CardHeader>
-                                        <CardContent>
-                                            <div className="text-center py-12">
-                                                <Settings className="w-12 h-12 mx-auto text-gray-400 mb-4" />
-                                                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                                                    Settings Coming Soon
-                                                </h3>
-                                                <p className="text-gray-600 dark:text-gray-400">
-                                                    System settings and configuration options will be available soon.
-                                                </p>
-                                            </div>
-                                        </CardContent>
-                                    </Card>
-                                </TabsContent>
                             </>
                         )}
 
-                        {/* Regular user tabs */}
+                        {/* Client-specific tabs */}
                         {user.role !== 'ADMIN' && (
                             <>
+                                <TabsContent value="billing" className="mt-6">
+                                    <ClientBilling />
+                                </TabsContent>
+
+                                <TabsContent value="invoices" className="mt-6">
+                                    <ClientInvoices />
+                                </TabsContent>
+
                                 <TabsContent value="my-tickets" className="mt-6">
                                     <Card>
                                         <CardHeader>

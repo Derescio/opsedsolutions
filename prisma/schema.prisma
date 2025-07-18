@@ -54,6 +54,39 @@ enum UpdateType {
   INTERNAL_NOTE
 }
 
+// Payment and subscription enums
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELLED
+  PAST_DUE
+  UNPAID
+  INCOMPLETE
+  TRIALING
+  PAUSED
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCEEDED
+  FAILED
+  CANCELLED
+  REFUNDED
+}
+
+enum PaymentType {
+  SUBSCRIPTION
+  ONE_TIME
+  SETUP_FEE
+}
+
+enum InvoiceStatus {
+  DRAFT
+  OPEN
+  PAID
+  UNCOLLECTIBLE
+  VOID
+}
+
 // User model - integrates with Clerk authentication
 model User {
   id        String   @id @default(cuid())
@@ -68,12 +101,20 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  // Stripe customer ID
+  stripeCustomerId String? @unique
+
   // Relationships
   ticketsCreated  Ticket[]       @relation("TicketCreator")
   ticketsAssigned Ticket[]       @relation("TicketAssignee")
   ticketUpdates   TicketUpdate[]
   sessions        Session[]
   Attachment      Attachment[]
+
+  // Payment relationships
+  subscriptions Subscription[]
+  payments      Payment[]
+  invoices      Invoice[]
 
   @@map("users")
 }
@@ -176,6 +217,113 @@ model Session {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("sessions")
+}
+
+// Subscription model
+model Subscription {
+  id                   String             @id @default(cuid())
+  userId               String
+  stripeSubscriptionId String             @unique
+  stripePriceId        String
+  stripeCustomerId     String
+  status               SubscriptionStatus
+  currentPeriodStart   DateTime
+  currentPeriodEnd     DateTime
+  cancelAtPeriodEnd    Boolean            @default(false)
+  canceledAt           DateTime?
+  endedAt              DateTime?
+  trialStart           DateTime?
+  trialEnd             DateTime?
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+
+  // Relationships
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  payments Payment[]
+  invoices Invoice[]
+
+  @@map("subscriptions")
+}
+
+// Payment model
+model Payment {
+  id                    String        @id @default(cuid())
+  userId                String
+  subscriptionId        String?
+  stripePaymentIntentId String        @unique
+  amount                Int // Amount in cents
+  currency              String        @default("usd")
+  status                PaymentStatus
+  type                  PaymentType
+  description           String?
+  receiptUrl            String?
+  invoiceId             String?
+
+  // Metadata
+  metadata  Json?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relationships
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subscription Subscription? @relation(fields: [subscriptionId], references: [id])
+  invoice      Invoice?      @relation(fields: [invoiceId], references: [id])
+
+  @@map("payments")
+}
+
+// Invoice model
+model Invoice {
+  id              String        @id @default(cuid())
+  userId          String
+  subscriptionId  String?
+  stripeInvoiceId String        @unique
+  number          String        @unique
+  status          InvoiceStatus
+  subtotal        Int // Amount in cents
+  tax             Int // Tax amount in cents
+  total           Int // Total amount in cents
+  currency        String        @default("usd")
+  description     String?
+
+  // Dates
+  invoiceDate DateTime
+  dueDate     DateTime?
+  paidAt      DateTime?
+  voidedAt    DateTime?
+
+  // URLs
+  invoiceUrl String?
+  pdfUrl     String?
+
+  // Metadata
+  metadata  Json?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relationships
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subscription Subscription? @relation(fields: [subscriptionId], references: [id])
+  payments     Payment[]
+
+  @@map("invoices")
+}
+
+// Pricing plan model (for display purposes)
+model PricingPlan {
+  id                        String   @id @default(cuid())
+  name                      String   @unique
+  description               String
+  price                     Int // Amount in cents
+  stripePriceId             String   @unique
+  stripeSubscriptionPriceId String   @unique
+  features                  Json // Array of features
+  isPopular                 Boolean  @default(false)
+  isActive                  Boolean  @default(true)
+  createdAt                 DateTime @default(now())
+  updatedAt                 DateTime @updatedAt
+
+  @@map("pricing_plans")
 }
 
 // Indexes for better performance

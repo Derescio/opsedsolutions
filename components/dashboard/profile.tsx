@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { User, Calendar, Mail, Phone, Shield } from 'lucide-react'
+import Image from 'next/image'
 
 interface ProfileUser {
     id: string
@@ -56,10 +57,12 @@ export default function Profile({ user }: ProfileProps) {
                         <div className="flex items-center gap-4">
                             <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
                                 {user.imageUrl ? (
-                                    <img
+                                    <Image
                                         src={user.imageUrl}
                                         alt={`${user.firstName} ${user.lastName}`}
                                         className="w-16 h-16 rounded-full object-cover"
+                                        width={64}
+                                        height={64}
                                     />
                                 ) : (
                                     <User className="w-8 h-8 text-primary" />
