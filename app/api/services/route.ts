@@ -48,7 +48,7 @@ export async function GET() {
     
     return NextResponse.json({ 
       error: 'Failed to fetch services',
-      details: error.message 
+      details: error.stack 
     }, { status: 500 })
   } finally {
     await db.$disconnect()
