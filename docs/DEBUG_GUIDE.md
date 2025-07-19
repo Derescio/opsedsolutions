@@ -1,5 +1,38 @@
 # Database User Creation & Role Management Debug Guide
 
+## 🎯 **Recent Debugging Success Stories** (July 18, 2025)
+
+### ✅ **Major Issues Successfully Resolved**
+Our comprehensive testing and debugging session resolved multiple critical bugs:
+
+1. **Payment Display Bug** ✅
+   - **Issue**: Projects showed "Paid: $0" even after successful payments
+   - **Root Cause**: Stripe webhooks don't reach localhost in development
+   - **Solution**: Created manual webhook simulation script
+   - **Script**: `portfolio/scripts/fix-payment-webhook.js`
+
+2. **Duplicate Add-ons Auto-Inclusion** ✅
+   - **Issue**: Service packages automatically included unwanted add-ons
+   - **Root Cause**: Hardcoded add-on inclusion in package selection
+   - **Solution**: Removed auto-inclusion, made add-ons optional recommendations
+
+3. **Add-on Payment Wrong Amount** ✅
+   - **Issue**: $100 add-on charged full project amount ($4,295)
+   - **Root Cause**: Used wrong payment function for add-ons
+   - **Solution**: Created dedicated `createAddOnPayment()` function
+
+4. **Database Schema Mismatches** ✅
+   - **Issue**: Documentation referenced non-existent `contactEmail` field
+   - **Root Cause**: Customer data stored in JSON metadata, not separate columns
+   - **Solution**: Updated all queries to use `metadata::jsonb -> 'customerInfo'`
+
+### 🛠️ **Debugging Tools Created**
+- `fix-payment-webhook.js` - Manual webhook simulation for development
+- `fix-duplicates.js` - Clean up duplicate database entries
+- `reset-project-status.js` - Reset project status for testing
+
+---
+
 ## Issue: Users Not Appearing in Database
 
 This guide will help you troubleshoot why users aren't being created in your database and how to set user roles properly.

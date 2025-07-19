@@ -20,7 +20,7 @@ type WebhookEvent = {
     public_metadata: {
       role?: 'ADMIN' | 'CLIENT' | 'SUPPORT' | 'MODERATOR'
     }
-    private_metadata: Record<string, any>
+    private_metadata: Record<string, unknown>
   }
   object: 'event'
   type: 'user.created' | 'user.updated' | 'user.deleted'

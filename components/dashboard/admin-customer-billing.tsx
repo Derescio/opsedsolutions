@@ -9,8 +9,7 @@ import {
     Users,
     CreditCard,
     Search,
-    Calendar,
-    DollarSign,
+
     ExternalLink,
     CheckCircle,
     XCircle,

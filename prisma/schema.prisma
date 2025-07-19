@@ -115,6 +115,7 @@ model User {
   subscriptions Subscription[]
   payments      Payment[]
   invoices      Invoice[]
+  projects      Project[] // Added for enhanced web agency pricing
 
   @@map("users")
 }
@@ -325,6 +326,232 @@ model PricingPlan {
 
   @@map("pricing_plans")
 }
+
+// ============================================================================
+// ENHANCED WEB AGENCY PRICING SYSTEM
+// ============================================================================
+
+// New enums for service-based pricing
+enum PriceType {
+  ONE_TIME
+  RECURRING
+  CUSTOM
+}
+
+enum AddOnPriceType {
+  FIXED
+  PERCENTAGE
+  CUSTOM
+}
+
+enum ProjectStatus {
+  QUOTE_REQUESTED
+  QUOTE_SENT
+  QUOTE_APPROVED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+// Service Categories (Website Development, Data Analytics, Hosting, etc.)
+model ServiceCategory {
+  id          String   @id @default(cuid())
+  name        String   @unique // "Website Development", "Data Analytics", "Hosting"
+  description String
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relationships
+  services Service[]
+
+  @@map("service_categories")
+}
+
+// Individual Services (Small Website, Medium Website, Basic Hosting, etc.)
+model Service {
+  id              String    @id @default(cuid())
+  categoryId      String
+  name            String // "Small Website", "Medium Website", "Enterprise Website"
+  description     String
+  basePrice       Int // Base price in cents
+  priceType       PriceType // ONE_TIME, RECURRING, CUSTOM
+  billingInterval String? // "month", "year", null for one-time
+  features        Json // Array of features
+  isActive        Boolean   @default(true)
+  sortOrder       Int       @default(0)
+
+  // Stripe integration
+  stripeProductId String?
+  stripePriceId   String?
+
+  // Metadata
+  metadata  Json?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relationships
+  category             ServiceCategory       @relation(fields: [categoryId], references: [id])
+  addOns               ServiceAddOn[]
+  projectServices      ProjectService[]
+  projectSubscriptions ProjectSubscription[]
+
+  @@map("services")
+}
+
+// Service Add-ons (Data Analytics, SEO, Priority Support, etc.)
+model ServiceAddOn {
+  id              String         @id @default(cuid())
+  serviceId       String
+  name            String // "Data Analytics", "SEO Package", "Priority Support"
+  description     String
+  priceType       AddOnPriceType // FIXED, PERCENTAGE, CUSTOM
+  price           Int? // Fixed price in cents
+  percentage      Float? // Percentage of base price
+  billingInterval String? // "month", "year", null for one-time
+  features        Json // Array of features
+  isActive        Boolean        @default(true)
+  sortOrder       Int            @default(0)
+
+  // Stripe integration
+  stripeProductId String?
+  stripePriceId   String?
+
+  // Metadata
+  metadata  Json?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relationships
+  service       Service        @relation(fields: [serviceId], references: [id])
+  projectAddOns ProjectAddOn[]
+
+  @@map("service_addons")
+}
+
+// Client Projects
+model Project {
+  id          String        @id @default(cuid())
+  userId      String
+  name        String
+  description String?
+  status      ProjectStatus @default(QUOTE_REQUESTED)
+  totalAmount Int // Total project cost in cents
+  paidAmount  Int           @default(0)
+
+  // Quote/Contract details
+  quoteValidUntil DateTime?
+  quoteNotes      String?
+  contractSigned  Boolean   @default(false)
+  contractDate    DateTime?
+
+  // Stripe integration
+  stripeCustomerId String?
+
+  // Metadata
+  metadata  Json?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relationships
+  user          User                  @relation(fields: [userId], references: [id])
+  services      ProjectService[]
+  addOns        ProjectAddOn[]
+  payments      ProjectPayment[]
+  subscriptions ProjectSubscription[]
+
+  @@map("projects")
+}
+
+// Project Services (Many-to-Many with custom pricing)
+model ProjectService {
+  id          String   @id @default(cuid())
+  projectId   String
+  serviceId   String
+  customPrice Int? // Override default price
+  customName  String? // Custom service name for enterprise
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relationships
+  project Project @relation(fields: [projectId], references: [id])
+  service Service @relation(fields: [serviceId], references: [id])
+
+  @@map("project_services")
+}
+
+// Project Add-ons
+model ProjectAddOn {
+  id          String   @id @default(cuid())
+  projectId   String
+  addOnId     String
+  customPrice Int? // Override calculated price
+  customName  String? // Custom add-on name
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relationships
+  project Project      @relation(fields: [projectId], references: [id])
+  addOn   ServiceAddOn @relation(fields: [addOnId], references: [id])
+
+  @@map("project_addons")
+}
+
+// Project Payments (One-time payments)
+model ProjectPayment {
+  id                    String        @id @default(cuid())
+  projectId             String
+  stripePaymentIntentId String        @unique
+  amount                Int // Amount in cents
+  currency              String        @default("usd")
+  status                PaymentStatus
+  description           String?
+  receiptUrl            String?
+
+  // Metadata
+  metadata  Json?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relationships
+  project Project @relation(fields: [projectId], references: [id])
+
+  @@map("project_payments")
+}
+
+// Project Subscriptions (For hosting and recurring services)
+model ProjectSubscription {
+  id                   String             @id @default(cuid())
+  projectId            String
+  serviceId            String // Reference to the recurring service
+  stripeSubscriptionId String             @unique
+  stripePriceId        String
+  stripeCustomerId     String
+  status               SubscriptionStatus
+  currentPeriodStart   DateTime
+  currentPeriodEnd     DateTime
+  cancelAtPeriodEnd    Boolean            @default(false)
+  canceledAt           DateTime?
+  endedAt              DateTime?
+
+  // Metadata
+  metadata  Json?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relationships
+  project Project @relation(fields: [projectId], references: [id])
+  service Service @relation(fields: [serviceId], references: [id])
+
+  @@map("project_subscriptions")
+}
+
+// Update User model to include projects relationship
+// (This will be added to existing User model)
+// projects Project[]
 
 // Indexes for better performance
 // These will be created automatically by Prisma

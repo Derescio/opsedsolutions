@@ -3,7 +3,7 @@
 import { getCurrentUser, requireAuth } from '@/lib/auth'
 import { PrismaClient } from '@/lib/generated/prisma'
 import { stripe } from '@/lib/stripe'
-import { redirect } from 'next/navigation'
+// import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 
 const prisma = new PrismaClient()

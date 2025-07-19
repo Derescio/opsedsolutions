@@ -3,6 +3,7 @@ import React from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useAuth } from '@clerk/nextjs'
 import { Button } from "@/components/ui/button"
 import { Menu, X } from "lucide-react"
 import { useState } from 'react'
@@ -12,31 +13,40 @@ import AuthButton from "@/components/auth-button"
 const Navbar = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false)
     const pathname = usePathname()
+    const { isSignedIn } = useAuth()
     const isHomepage = pathname === '/'
 
     // Smart navigation: anchor links on homepage, page links elsewhere
-    const getNavItems = () => [
-        { name: 'Home', href: '/' },
-        {
-            name: 'Projects',
-            href: isHomepage ? '#projects' : '/projects'
-        },
-        {
-            name: 'Services',
-            href: isHomepage ? '#services' : '/services'
-        },
-        {
-            name: 'About',
-            href: isHomepage ? '#about' : '/about'
-        },
-        { name: 'Pricing', href: '/pricing' },
-        { name: 'Blog', href: '/blog' },
-        // { name: 'Studio', href: '/studio' },
-        {
-            name: 'Contact',
-            href: isHomepage ? '#contact' : '/#contact'
-        },
-    ]
+    const getNavItems = () => {
+        const baseItems = [
+            { name: 'Home', href: '/' },
+            {
+                name: 'Projects',
+                href: isHomepage ? '#projects' : '/projects'
+            },
+            {
+                name: 'Services',
+                href: isHomepage ? '#services' : '/services'
+            },
+            {
+                name: 'About',
+                href: isHomepage ? '#about' : '/about'
+            },
+            { name: 'Blog', href: '/blog' },
+            // { name: 'Studio', href: '/studio' },
+            {
+                name: 'Contact',
+                href: isHomepage ? '#contact' : '/#contact'
+            },
+        ]
+
+        // Only add Pricing if user is signed in
+        if (isSignedIn) {
+            baseItems.splice(-1, 0, { name: 'Pricing', href: '/pricing' })
+        }
+
+        return baseItems
+    }
 
     const navItems = getNavItems()
 

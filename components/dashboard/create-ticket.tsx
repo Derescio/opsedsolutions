@@ -26,7 +26,7 @@ export default function CreateTicket() {
         { value: 'URGENT', label: 'Urgent', color: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400' }
     ]
 
-    const categoryOptions: { value: TicketCategory; label: string; icon: any }[] = [
+    const categoryOptions: { value: TicketCategory; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
         { value: 'PROJECT_SETUP', label: 'Project Setup', icon: Plus },
         { value: 'TECHNICAL', label: 'Technical Issue', icon: AlertCircle },
         { value: 'BUG_REPORT', label: 'Bug Report', icon: Bug },
