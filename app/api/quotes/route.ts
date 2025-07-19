@@ -24,6 +24,7 @@ export async function POST(request: Request) {
     })
 
     // Create the project
+    console.log('Creating project...')
     const project = await db.project.create({
       data: {
         userId,
@@ -40,29 +41,70 @@ export async function POST(request: Request) {
         }
       }
     })
+    console.log('Project created:', project.id)
 
     // Create project services
+    console.log('Creating project services for:', selectedServices.length, 'services')
+    const serviceErrors: any[] = []
+    
     for (const selectedService of selectedServices) {
-      await db.projectService.create({
-        data: {
-          projectId: project.id,
-          serviceId: selectedService.service.id,
-          customName: selectedService.service.name,
-          notes: `Selected from pricing page - ${selectedService.service.description}`
+      console.log('Creating service:', selectedService.service.id, selectedService.service.name)
+      
+      try {
+        // First verify the service exists
+        const serviceExists = await db.service.findUnique({
+          where: { id: selectedService.service.id }
+        })
+        
+        if (!serviceExists) {
+          console.error('Service not found in database:', selectedService.service.id)
+          serviceErrors.push(`Service "${selectedService.service.name}" not found`)
+          continue
         }
-      })
-
-      // Create project add-ons if any
-      for (const addOn of selectedService.addOns || []) {
-        await db.projectAddOn.create({
+        
+        await db.projectService.create({
           data: {
             projectId: project.id,
-            addOnId: addOn.id,
-            customName: addOn.name,
-            notes: `Selected from pricing page`
+            serviceId: selectedService.service.id,
+            customName: selectedService.service.name,
+            notes: `Selected from pricing page - ${selectedService.service.description}`
           }
         })
+        console.log('Service created successfully')
+        
+        // Create project add-ons if any
+        if (selectedService.addOns && selectedService.addOns.length > 0) {
+          console.log('Creating', selectedService.addOns.length, 'add-ons')
+          for (const addOn of selectedService.addOns) {
+            try {
+              await db.projectAddOn.create({
+                data: {
+                  projectId: project.id,
+                  addOnId: addOn.id,
+                  customName: addOn.name,
+                  notes: `Selected from pricing page`
+                }
+              })
+            } catch (addOnError: any) {
+              console.error('Error creating add-on:', addOn.name, addOnError.message)
+              serviceErrors.push(`Add-on "${addOn.name}" failed: ${addOnError.message}`)
+            }
+          }
+        }
+      } catch (serviceError: any) {
+        console.error('Error creating project service:', {
+          serviceId: selectedService.service.id,
+          serviceName: selectedService.service.name,
+          error: serviceError.message,
+          code: serviceError.code
+        })
+        serviceErrors.push(`Service "${selectedService.service.name}": ${serviceError.message}`)
       }
+    }
+    
+    if (serviceErrors.length > 0) {
+      console.warn('Some services/add-ons failed to create:', serviceErrors)
+      // Still return success but log the issues
     }
 
     console.log('Project created successfully:', project.id)
