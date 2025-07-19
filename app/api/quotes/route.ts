@@ -4,20 +4,33 @@ import { auth } from '@clerk/nextjs/server'
 
 export async function POST(request: Request) {
   try {
-    const { userId } = await auth()
+    const { userId: clerkId } = await auth()
     
-    if (!userId) {
+    if (!clerkId) {
       return NextResponse.json({ 
         success: false,
         error: 'Authentication required' 
       }, { status: 401 })
     }
 
+    // Look up the user's internal database ID
+    const user = await db.user.findUnique({
+      where: { clerkId }
+    })
+
+    if (!user) {
+      return NextResponse.json({ 
+        success: false,
+        error: 'User not found in database' 
+      }, { status: 404 })
+    }
+
     const body = await request.json()
     const { quote, contactInfo, selectedServices } = body
 
     console.log('Creating project with quote:', {
-      userId,
+      clerkId,
+      userId: user.id,
       contactInfo,
       quote,
       selectedServices
@@ -27,7 +40,7 @@ export async function POST(request: Request) {
     console.log('Creating project...')
     const project = await db.project.create({
       data: {
-        userId,
+        userId: user.id,
         name: `${contactInfo.company || contactInfo.name}'s Project`,
         description: contactInfo.requirements || 'Quote request from pricing page',
         status: 'QUOTE_REQUESTED',
@@ -132,14 +145,23 @@ export async function POST(request: Request) {
 
 export async function GET() {
   try {
-    const { userId } = await auth()
-    if (!userId) {
+    const { userId: clerkId } = await auth()
+    if (!clerkId) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
+    }
+
+    // Look up the user's internal database ID
+    const user = await db.user.findUnique({
+      where: { clerkId }
+    })
+
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 })
     }
 
     // Get user's projects/quotes
     const projects = await db.project.findMany({
-      where: { userId },
+      where: { userId: user.id },
       include: {
         services: {
           include: {
