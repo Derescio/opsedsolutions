@@ -193,7 +193,7 @@ export default function PricingCalculator() {
             style: 'currency',
             currency: 'USD',
             minimumFractionDigits: 0
-        }).format(price / 100)
+        }).format(price / 100) // Prices stored in cents in database
     }
 
     const getCategoryIcon = (categoryName: string) => {

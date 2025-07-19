@@ -66,13 +66,13 @@ export default function PricingCard({ plan, user }: PricingCardProps) {
             style: 'currency',
             currency: 'USD',
             minimumFractionDigits: 0
-        }).format(price)
+        }).format(price / 100) // Prices stored in cents in database
     }
 
     return (
         <Card className={`relative overflow-hidden transition-all duration-300 hover:shadow-lg ${plan.popular
-                ? 'border-2 border-blue-500 shadow-lg transform scale-105'
-                : 'border border-gray-200 dark:border-gray-700'
+            ? 'border-2 border-blue-500 shadow-lg transform scale-105'
+            : 'border border-gray-200 dark:border-gray-700'
             }`}>
             {/* Popular Badge */}
             {plan.popular && (
@@ -84,8 +84,8 @@ export default function PricingCard({ plan, user }: PricingCardProps) {
             <CardHeader className="text-center pb-6">
                 <div className="flex justify-center mb-4">
                     <div className={`p-3 rounded-full ${plan.popular
-                            ? 'bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-300'
-                            : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400'
+                        ? 'bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-300'
+                        : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400'
                         }`}>
                         {plan.icon}
                     </div>
@@ -132,8 +132,8 @@ export default function PricingCard({ plan, user }: PricingCardProps) {
                         onClick={handleSubscribe}
                         disabled={loading}
                         className={`w-full py-3 text-base font-medium transition-all duration-200 ${plan.popular
-                                ? 'bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white shadow-lg hover:shadow-xl'
-                                : 'bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-200'
+                            ? 'bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white shadow-lg hover:shadow-xl'
+                            : 'bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-200'
                             }`}
                     >
                         {loading ? (

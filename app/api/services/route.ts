@@ -1,11 +1,9 @@
 import { NextResponse } from 'next/server'
-import { PrismaClient } from '@/lib/generated/prisma'
-
-const prisma = new PrismaClient()
+import { db } from '@/lib/db'
 
 export async function GET() {
   try {
-    const services = await prisma.service.findMany({
+    const services = await db.service.findMany({
       where: { isActive: true },
       orderBy: { sortOrder: 'asc' },
       include: {
