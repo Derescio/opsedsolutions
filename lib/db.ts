@@ -54,25 +54,54 @@ export const userHelpers = {
     imageUrl?: string
     phone?: string
   }) {
-    return await db.user.upsert({
-      where: { clerkId },
-      update: {
-        email: userData.email,
-        firstName: userData.firstName,
-        lastName: userData.lastName,
-        imageUrl: userData.imageUrl,
-        phone: userData.phone,
-        updatedAt: new Date()
-      },
-      create: {
-        clerkId,
-        email: userData.email,
-        firstName: userData.firstName,
-        lastName: userData.lastName,
-        imageUrl: userData.imageUrl,
-        phone: userData.phone
+    try {
+      return await db.user.upsert({
+        where: { clerkId },
+        update: {
+          email: userData.email,
+          firstName: userData.firstName,
+          lastName: userData.lastName,
+          imageUrl: userData.imageUrl,
+          phone: userData.phone,
+          updatedAt: new Date()
+        },
+        create: {
+          clerkId,
+          email: userData.email,
+          firstName: userData.firstName,
+          lastName: userData.lastName,
+          imageUrl: userData.imageUrl,
+          phone: userData.phone
+        }
+      })
+    } catch (error: any) {
+      // Handle unique constraint error on email (P2002)
+      if (error.code === 'P2002' && error.meta?.target?.includes('email')) {
+        console.log(`User with email ${userData.email} already exists, updating with new clerkId`)
+        
+        // Find and update the existing user with the new clerkId
+        const existingUser = await db.user.findUnique({
+          where: { email: userData.email }
+        })
+        
+        if (existingUser) {
+          return await db.user.update({
+            where: { id: existingUser.id },
+            data: {
+              clerkId,
+              firstName: userData.firstName,
+              lastName: userData.lastName,
+              imageUrl: userData.imageUrl,
+              phone: userData.phone,
+              updatedAt: new Date()
+            }
+          })
+        }
       }
-    })
+      
+      // Re-throw if it's a different error
+      throw error
+    }
   },
 
   // Get user by Clerk ID
