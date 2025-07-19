@@ -1,68 +1,103 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { PrismaClient } from '@/lib/generated/prisma'
-import { getCurrentUser } from '@/lib/auth'
-import { createProject } from '@/lib/actions/project-actions'
+import { NextResponse } from 'next/server'
+import { db } from '@/lib/db'
+import { auth } from '@clerk/nextjs/server'
 
-const prisma = new PrismaClient()
-
-export async function POST(request: NextRequest) {
+export async function POST(request: Request) {
   try {
-    const user = await getCurrentUser()
-    if (!user) {
-      return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
+    const { userId } = await auth()
+    
+    if (!userId) {
+      return NextResponse.json({ 
+        success: false,
+        error: 'Authentication required' 
+      }, { status: 401 })
     }
 
     const body = await request.json()
-    const { 
-      name,
-      description,
-      services,
-      customerInfo,
-      requirements
-    } = body
+    const { quote, contactInfo, selectedServices } = body
 
-    // Create project using the existing project action
-    const result = await createProject({
-      name,
-      description,
-      services,
-      customerInfo,
-      requirements
+    console.log('Creating project with quote:', {
+      userId,
+      contactInfo,
+      quote,
+      selectedServices
     })
 
-    if (result.success) {
-      // TODO: Send email notification to admin
-      // TODO: Send confirmation email to client
-      
-      return NextResponse.json({ 
-        success: true, 
-        project: result.project,
-        message: 'Quote request submitted successfully'
+    // Create the project
+    const project = await db.project.create({
+      data: {
+        userId,
+        name: `${contactInfo.company || contactInfo.name}'s Project`,
+        description: contactInfo.requirements || 'Quote request from pricing page',
+        status: 'QUOTE_REQUESTED',
+        totalAmount: quote.oneTimeTotal,
+        paidAmount: 0,
+        quoteNotes: `Contact: ${contactInfo.name} (${contactInfo.email})${contactInfo.phone ? `, Phone: ${contactInfo.phone}` : ''}`,
+        metadata: {
+          contactInfo,
+          quoteBreakdown: quote.breakdown,
+          submissionDate: new Date().toISOString()
+        }
+      }
+    })
+
+    // Create project services
+    for (const selectedService of selectedServices) {
+      await db.projectService.create({
+        data: {
+          projectId: project.id,
+          serviceId: selectedService.service.id,
+          customName: selectedService.service.name,
+          notes: `Selected from pricing page - ${selectedService.service.description}`
+        }
       })
-    } else {
-      return NextResponse.json({ 
-        success: false, 
-        error: result.error 
-      }, { status: 400 })
+
+      // Create project add-ons if any
+      for (const addOn of selectedService.addOns || []) {
+        await db.projectAddOn.create({
+          data: {
+            projectId: project.id,
+            addOnId: addOn.id,
+            customName: addOn.name,
+            notes: `Selected from pricing page`
+          }
+        })
+      }
     }
-  } catch (error) {
-    console.error('Error creating quote:', error)
+
+    console.log('Project created successfully:', project.id)
+
+    return NextResponse.json({
+      success: true,
+      projectId: project.id,
+      message: 'Quote request submitted successfully!'
+    })
+
+  } catch (error: any) {
+    console.error('Error creating quote:', {
+      message: error.message,
+      code: error.code,
+      meta: error.meta
+    })
+    
     return NextResponse.json({ 
-      error: 'Internal server error' 
+      success: false,
+      error: 'Failed to submit quote request',
+      details: error.message 
     }, { status: 500 })
   }
 }
 
 export async function GET() {
   try {
-    const user = await getCurrentUser()
-    if (!user) {
+    const { userId } = await auth()
+    if (!userId) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
     }
 
     // Get user's projects/quotes
-    const projects = await prisma.project.findMany({
-      where: { userId: user.id },
+    const projects = await db.project.findMany({
+      where: { userId },
       include: {
         services: {
           include: {

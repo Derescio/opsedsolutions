@@ -87,7 +87,7 @@ const PRESET_PACKAGES = [
         name: 'Starter Package',
         description: 'Perfect for small businesses and personal websites',
         price: { oneTime: 1500, recurring: 20 },
-        services: ['website-basic'],
+        services: ['Small Website'],
         addOns: [],
         features: [
             'Responsive Website Design',
@@ -105,7 +105,7 @@ const PRESET_PACKAGES = [
         name: 'Professional Package',
         description: 'Ideal for growing businesses with advanced needs',
         price: { oneTime: 2800, recurring: 45 },
-        services: ['website-professional'],
+        services: ['Medium Website'],
         addOns: [],
         features: [
             'Advanced Website Design',
@@ -125,7 +125,7 @@ const PRESET_PACKAGES = [
         name: 'Enterprise Package',
         description: 'Complete solution for large organizations',
         price: { oneTime: 12500, recurring: 150 },
-        services: ['website-enterprise'],
+        services: ['Enterprise Website'],
         addOns: [],
         features: [
             'Custom Enterprise Solution',
@@ -245,8 +245,8 @@ export default function ServiceSelector() {
         const packageServices: SelectedService[] = []
 
         // Add main services
-        pkg.services.forEach(serviceId => {
-            const service = availableServices.find(s => s.id === serviceId)
+        pkg.services.forEach(serviceName => {
+            const service = availableServices.find(s => s.name === serviceName)
             if (service) {
                 // Don't auto-add add-ons, let user choose
                 packageServices.push({
@@ -280,13 +280,36 @@ export default function ServiceSelector() {
         setSubmitting(true)
 
         try {
-            // In a real application, you would send this data to your backend
-            // For demonstration, we'll just show a success message
-            toast.success('Quote request submitted successfully!')
-            router.push('/dashboard?tab=projects&success=true')
-        } catch (error) {
+            console.log('Submitting quote with data:', { quote, contactInfo, selectedServices })
+
+            const response = await fetch('/api/quotes', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    quote,
+                    contactInfo,
+                    selectedServices
+                })
+            })
+
+            const data = await response.json()
+            console.log('API Response:', data)
+
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${data.error || 'Request failed'}`)
+            }
+
+            if (data.success) {
+                toast.success(data.message || 'Quote request submitted successfully!')
+                router.push('/dashboard?tab=projects&success=true')
+            } else {
+                throw new Error(data.error || 'Failed to submit quote request')
+            }
+        } catch (error: any) {
             console.error('Error submitting quote:', error)
-            toast.error('Failed to submit quote request')
+            toast.error(error.message || 'Failed to submit quote request')
         } finally {
             setSubmitting(false)
         }

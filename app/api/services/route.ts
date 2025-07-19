@@ -37,7 +37,11 @@ export async function GET() {
     })
 
     console.log(`Found ${services.length} services`)
-    return NextResponse.json(services)
+    return NextResponse.json({
+      success: true,
+      services: services,
+      addOns: services.flatMap(service => service.addOns || [])
+    })
   } catch (error: any) {
     console.error('Detailed error fetching services:', {
       message: error.message,
@@ -47,6 +51,7 @@ export async function GET() {
     })
     
     return NextResponse.json({ 
+      success: false,
       error: 'Failed to fetch services',
       details: error.stack 
     }, { status: 500 })
