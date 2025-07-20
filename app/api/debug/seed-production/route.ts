@@ -174,12 +174,13 @@ export async function POST() {
       }
     })
 
-  } catch (error: any) {
+  } catch (error) {
     console.error('Error seeding production database:', error)
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
     return NextResponse.json({ 
       success: false,
       error: 'Failed to seed database',
-      details: error.message 
+      details: errorMessage 
     }, { status: 500 })
   }
 } 

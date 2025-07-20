@@ -31,15 +31,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Project not found' }, { status: 404 })
     }
 
-    // Create a test payment record
-    const payment = await prisma.payment.create({
+    // Create a test PROJECT payment record
+    const payment = await prisma.projectPayment.create({
       data: {
-        userId: project.userId,
+        projectId: project.id,
         stripePaymentIntentId: `test_${Date.now()}`,
         amount: paymentAmount,
         currency: 'usd',
         status: 'SUCCEEDED',
-        type: 'ONE_TIME',
         description: `Test payment for ${project.name}`,
         metadata: {
           projectId: project.id,
@@ -48,15 +47,11 @@ export async function POST(request: NextRequest) {
       }
     })
 
-    // Calculate total paid amount from all successful payments
-    const allPayments = await prisma.payment.findMany({
+    // Calculate total paid amount from all successful PROJECT payments
+    const allPayments = await prisma.projectPayment.findMany({
       where: {
-        userId: project.userId,
-        status: 'SUCCEEDED',
-        metadata: {
-          path: ['projectId'],
-          equals: projectId
-        }
+        projectId: projectId,
+        status: 'SUCCEEDED'
       }
     })
 

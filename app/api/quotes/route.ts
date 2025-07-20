@@ -58,7 +58,7 @@ export async function POST(request: Request) {
 
     // Create project services
     console.log('Creating project services for:', selectedServices.length, 'services')
-    const serviceErrors: any[] = []
+    const serviceErrors: string[] = []
     
     for (const selectedService of selectedServices) {
       console.log('Creating service:', selectedService.service.id, selectedService.service.name)
@@ -98,20 +98,21 @@ export async function POST(request: Request) {
                   notes: `Selected from pricing page`
                 }
               })
-            } catch (addOnError: any) {
-              console.error('Error creating add-on:', addOn.name, addOnError.message)
-              serviceErrors.push(`Add-on "${addOn.name}" failed: ${addOnError.message}`)
+            } catch (addOnError) {
+              const errorMessage = addOnError instanceof Error ? addOnError.message : 'Unknown error'
+              console.error('Error creating add-on:', addOn.name, errorMessage)
+              serviceErrors.push(`Add-on "${addOn.name}" failed: ${errorMessage}`)
             }
           }
         }
-      } catch (serviceError: any) {
+      } catch (serviceError) {
+        const errorMessage = serviceError instanceof Error ? serviceError.message : 'Unknown error'
         console.error('Error creating project service:', {
           serviceId: selectedService.service.id,
           serviceName: selectedService.service.name,
-          error: serviceError.message,
-          code: serviceError.code
+          error: errorMessage
         })
-        serviceErrors.push(`Service "${selectedService.service.name}": ${serviceError.message}`)
+        serviceErrors.push(`Service "${selectedService.service.name}": ${errorMessage}`)
       }
     }
     
@@ -128,17 +129,16 @@ export async function POST(request: Request) {
       message: 'Quote request submitted successfully!'
     })
 
-  } catch (error: any) {
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
     console.error('Error creating quote:', {
-      message: error.message,
-      code: error.code,
-      meta: error.meta
+      message: errorMessage
     })
     
     return NextResponse.json({ 
       success: false,
       error: 'Failed to submit quote request',
-      details: error.message 
+      details: errorMessage 
     }, { status: 500 })
   }
 }

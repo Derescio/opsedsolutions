@@ -162,7 +162,7 @@ export async function canAccessTicket(ticketId: string) {
     limit: 1
   })
   
-  return tickets.tickets.some((t: any) => t.id === ticketId)
+  return tickets.tickets.some((t: { id: string }) => t.id === ticketId)
 }
 
 // Authentication helpers for client components

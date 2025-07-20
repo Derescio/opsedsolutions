@@ -171,26 +171,58 @@ async function handleCheckoutSessionCompleted(session: StripeCheckoutSession) {
         receiptUrl = charge.receipt_url
       }
       
-      await prisma.payment.create({
-        data: {
-          userId: user.id,
-          stripePaymentIntentId: paymentIntentId,
-          amount: paymentIntent.amount,
-          currency: paymentIntent.currency,
-          status: PaymentStatus.SUCCEEDED,
-          type: PaymentType.ONE_TIME,
-          description: paymentIntent.description || 'One-time payment',
-          receiptUrl,
-          metadata: paymentIntent.metadata || {}
-        }
-      })
-
-      // Get project ID for both invoice creation and project updates
+      // Get project ID for both payment creation and project updates
       const projectId = paymentIntent.metadata?.projectId || session.metadata?.projectId
 
-      // Create invoice record for project payments
       if (projectId) {
-        // Check if invoice already exists for this payment
+        // Create PROJECT payment record (not general payment)
+        await prisma.projectPayment.create({
+          data: {
+            projectId,
+            stripePaymentIntentId: paymentIntentId,
+            amount: paymentIntent.amount,
+            currency: paymentIntent.currency,
+            status: PaymentStatus.SUCCEEDED,
+            description: paymentIntent.description || 'Project payment',
+            receiptUrl,
+            metadata: paymentIntent.metadata || {}
+          }
+        })
+        
+        console.log(`ProjectPayment created for ${paymentIntentId}`)
+
+        // Update project paid amount immediately
+        const project = await prisma.project.findUnique({
+          where: { id: projectId },
+          include: {
+            payments: {
+              where: { status: PaymentStatus.SUCCEEDED }
+            }
+          }
+        })
+
+        if (project) {
+          // Calculate total paid amount from all successful project payments
+          const totalPaid = project.payments.reduce((sum, p) => sum + p.amount, 0)
+          
+          // Update project with new paid amount
+          await prisma.project.update({
+            where: { id: projectId },
+            data: { 
+              paidAmount: totalPaid,
+              // If fully paid, update status to IN_PROGRESS
+              ...(totalPaid >= project.totalAmount && project.status === 'QUOTE_APPROVED' && {
+                status: 'IN_PROGRESS'
+              })
+            }
+          })
+
+          console.log(`Project ${projectId} paid amount updated to ${totalPaid} via checkout session`)
+        } else {
+          console.error('Project not found:', projectId)
+        }
+
+        // Create invoice record for project payments
         const existingInvoice = await prisma.invoice.findFirst({
           where: { 
             AND: [
@@ -222,37 +254,21 @@ async function handleCheckoutSessionCompleted(session: StripeCheckoutSession) {
           })
           console.log(`Invoice created for checkout session payment ${paymentIntentId}`)
         }
-
-        // Update project paid amount
-        const project = await prisma.project.findUnique({
-          where: { id: projectId },
-          include: {
-            payments: {
-              where: { status: PaymentStatus.SUCCEEDED }
-            }
+      } else {
+        // For non-project payments, use general payment table
+        await prisma.payment.create({
+          data: {
+            userId: user.id,
+            stripePaymentIntentId: paymentIntentId,
+            amount: paymentIntent.amount,
+            currency: paymentIntent.currency,
+            status: PaymentStatus.SUCCEEDED,
+            type: PaymentType.ONE_TIME,
+            description: paymentIntent.description || 'One-time payment',
+            receiptUrl,
+            metadata: paymentIntent.metadata || {}
           }
         })
-
-        if (project) {
-          // Calculate total paid amount from all successful payments
-          const totalPaid = project.payments.reduce((sum, p) => sum + p.amount, 0)
-          
-          // Update project with new paid amount
-          await prisma.project.update({
-            where: { id: projectId },
-            data: { 
-              paidAmount: totalPaid,
-              // If fully paid, update status to IN_PROGRESS
-              ...(totalPaid >= project.totalAmount && project.status === 'QUOTE_APPROVED' && {
-                status: 'IN_PROGRESS'
-              })
-            }
-          })
-
-          console.log(`Project ${projectId} paid amount updated to ${totalPaid} via checkout session`)
-        } else {
-          console.error('Project not found:', projectId)
-        }
       }
     }
 
@@ -468,66 +484,29 @@ async function handlePaymentIntentSucceeded(paymentIntent: StripePaymentIntent) 
       receiptUrl = charge.receipt_url
     }
 
-    // Update or create payment record
-    const payment = await prisma.payment.upsert({
-      where: { stripePaymentIntentId: paymentIntent.id },
-      update: {
-        status: PaymentStatus.SUCCEEDED,
-        receiptUrl
-      },
-      create: {
-        userId: user.id,
-        stripePaymentIntentId: paymentIntent.id,
-        amount: paymentIntent.amount,
-        currency: paymentIntent.currency,
-        status: PaymentStatus.SUCCEEDED,
-        type: PaymentType.ONE_TIME,
-        description: paymentIntent.description || 'Payment',
-        receiptUrl,
-        metadata: paymentIntent.metadata || {}
-      }
-    })
-
-    // Create invoice record for project payments
     const projectId = paymentIntent.metadata?.projectId
-    if (projectId && payment.status === PaymentStatus.SUCCEEDED) {
-      // Check if invoice already exists for this payment
-      const existingInvoice = await prisma.invoice.findFirst({
-        where: { 
-          AND: [
-            { userId: user.id },
-            { description: { contains: projectId } },
-            { stripeInvoiceId: paymentIntent.id }
-          ]
+
+    if (projectId) {
+      // Update or create PROJECT payment record
+      const payment = await prisma.projectPayment.upsert({
+        where: { stripePaymentIntentId: paymentIntent.id },
+        update: {
+          status: PaymentStatus.SUCCEEDED,
+          receiptUrl
+        },
+        create: {
+          projectId,
+          stripePaymentIntentId: paymentIntent.id,
+          amount: paymentIntent.amount,
+          currency: paymentIntent.currency,
+          status: PaymentStatus.SUCCEEDED,
+          description: paymentIntent.description || 'Project payment',
+          receiptUrl,
+          metadata: paymentIntent.metadata || {}
         }
       })
 
-      if (!existingInvoice) {
-        // Create invoice record
-        await prisma.invoice.create({
-          data: {
-            userId: user.id,
-            stripeInvoiceId: paymentIntent.id,
-            number: `PAY-${Date.now()}`,
-            status: InvoiceStatus.PAID,
-            subtotal: paymentIntent.amount,
-            tax: 0,
-            total: paymentIntent.amount,
-            currency: paymentIntent.currency,
-            description: `Project Payment - ${paymentIntent.description || 'Project Payment'}`,
-            invoiceDate: new Date(),
-            paidAt: new Date(),
-            invoiceUrl: receiptUrl,
-            pdfUrl: receiptUrl
-          }
-        })
-        console.log(`Invoice created for project payment ${paymentIntent.id}`)
-      }
-    }
-
-    // Update project paid amount if this payment is for a project
-    if (projectId) {
-      // Get current project to calculate new paid amount
+      // Update project paid amount immediately after payment record is created/updated
       const project = await prisma.project.findUnique({
         where: { id: projectId },
         include: {
@@ -538,7 +517,7 @@ async function handlePaymentIntentSucceeded(paymentIntent: StripePaymentIntent) 
       })
 
       if (project) {
-        // Calculate total paid amount from all successful payments
+        // Calculate total paid amount from all successful project payments
         const totalPaid = project.payments.reduce((sum, p) => sum + p.amount, 0)
         
         // Update project with new paid amount
@@ -557,6 +536,60 @@ async function handlePaymentIntentSucceeded(paymentIntent: StripePaymentIntent) 
       } else {
         console.error('Project not found:', projectId)
       }
+
+      // Create invoice record for project payments
+      if (payment.status === PaymentStatus.SUCCEEDED) {
+        const existingInvoice = await prisma.invoice.findFirst({
+          where: { 
+            AND: [
+              { userId: user.id },
+              { description: { contains: projectId } },
+              { stripeInvoiceId: paymentIntent.id }
+            ]
+          }
+        })
+
+        if (!existingInvoice) {
+          await prisma.invoice.create({
+            data: {
+              userId: user.id,
+              stripeInvoiceId: paymentIntent.id,
+              number: `PAY-${Date.now()}`,
+              status: InvoiceStatus.PAID,
+              subtotal: paymentIntent.amount,
+              tax: 0,
+              total: paymentIntent.amount,
+              currency: paymentIntent.currency,
+              description: `Project Payment - ${paymentIntent.description || 'Project Payment'}`,
+              invoiceDate: new Date(),
+              paidAt: new Date(),
+              invoiceUrl: receiptUrl,
+              pdfUrl: receiptUrl
+            }
+          })
+          console.log(`Invoice created for project payment ${paymentIntent.id}`)
+        }
+      }
+    } else {
+      // For non-project payments, use general payment table
+      await prisma.payment.upsert({
+        where: { stripePaymentIntentId: paymentIntent.id },
+        update: {
+          status: PaymentStatus.SUCCEEDED,
+          receiptUrl
+        },
+        create: {
+          userId: user.id,
+          stripePaymentIntentId: paymentIntent.id,
+          amount: paymentIntent.amount,
+          currency: paymentIntent.currency,
+          status: PaymentStatus.SUCCEEDED,
+          type: PaymentType.ONE_TIME,
+          description: paymentIntent.description || 'Payment',
+          receiptUrl,
+          metadata: paymentIntent.metadata || {}
+        }
+      })
     }
 
     console.log('Payment intent processed successfully')
@@ -580,23 +613,44 @@ async function handlePaymentIntentFailed(paymentIntent: StripePaymentIntent) {
       return
     }
 
-    // Update payment record to failed
-    await prisma.payment.upsert({
-      where: { stripePaymentIntentId: paymentIntent.id },
-      update: {
-        status: PaymentStatus.FAILED
-      },
-      create: {
-        userId: user.id,
-        stripePaymentIntentId: paymentIntent.id,
-        amount: paymentIntent.amount,
-        currency: paymentIntent.currency,
-        status: PaymentStatus.FAILED,
-        type: PaymentType.ONE_TIME,
-        description: paymentIntent.description || 'Payment',
-        metadata: paymentIntent.metadata || {}
-      }
-    })
+    const projectId = paymentIntent.metadata?.projectId
+
+    if (projectId) {
+      // Update PROJECT payment record to failed
+      await prisma.projectPayment.upsert({
+        where: { stripePaymentIntentId: paymentIntent.id },
+        update: {
+          status: PaymentStatus.FAILED
+        },
+        create: {
+          projectId,
+          stripePaymentIntentId: paymentIntent.id,
+          amount: paymentIntent.amount,
+          currency: paymentIntent.currency,
+          status: PaymentStatus.FAILED,
+          description: paymentIntent.description || 'Project payment',
+          metadata: paymentIntent.metadata || {}
+        }
+      })
+    } else {
+      // Update general payment record to failed
+      await prisma.payment.upsert({
+        where: { stripePaymentIntentId: paymentIntent.id },
+        update: {
+          status: PaymentStatus.FAILED
+        },
+        create: {
+          userId: user.id,
+          stripePaymentIntentId: paymentIntent.id,
+          amount: paymentIntent.amount,
+          currency: paymentIntent.currency,
+          status: PaymentStatus.FAILED,
+          type: PaymentType.ONE_TIME,
+          description: paymentIntent.description || 'Payment',
+          metadata: paymentIntent.metadata || {}
+        }
+      })
+    }
 
     console.log('Payment intent failure processed')
   } catch (error) {
@@ -605,7 +659,7 @@ async function handlePaymentIntentFailed(paymentIntent: StripePaymentIntent) {
 }
 
 // Handle customer created
-async function handleCustomerCreated(customer: any) {
+async function handleCustomerCreated(customer: { id: string; email?: string }) {
   console.log('Customer created:', customer.id)
   
   try {
@@ -624,7 +678,7 @@ async function handleCustomerCreated(customer: any) {
 }
 
 // Handle customer updated
-async function handleCustomerUpdated(customer: any) {
+async function handleCustomerUpdated(customer: { id: string; email?: string }) {
   console.log('Customer updated:', customer.id)
   
   try {
@@ -647,7 +701,7 @@ async function handleCustomerUpdated(customer: any) {
 }
 
 // Handle invoice created
-async function handleInvoiceCreated(invoice: any) {
+async function handleInvoiceCreated(invoice: StripeInvoice) {
   console.log('Invoice created:', invoice.id)
   
   try {
@@ -669,9 +723,9 @@ async function handleInvoiceCreated(invoice: any) {
           where: { stripeSubscriptionId: invoice.subscription }
         }))?.id : null,
         stripeInvoiceId: invoice.id,
-        number: invoice.number,
+        number: invoice.number || `INV-${Date.now()}`,
         status: mapStripeInvoiceStatus(invoice.status),
-        subtotal: invoice.subtotal,
+        subtotal: invoice.subtotal || 0,
         tax: invoice.tax || 0,
         total: invoice.total,
         currency: invoice.currency,
@@ -691,7 +745,7 @@ async function handleInvoiceCreated(invoice: any) {
 }
 
 // Handle invoice updated
-async function handleInvoiceUpdated(invoice: any) {
+async function handleInvoiceUpdated(invoice: StripeInvoice) {
   console.log('Invoice updated:', invoice.id)
   
   try {
@@ -699,7 +753,7 @@ async function handleInvoiceUpdated(invoice: any) {
       where: { stripeInvoiceId: invoice.id },
       data: {
         status: mapStripeInvoiceStatus(invoice.status),
-        subtotal: invoice.subtotal,
+        subtotal: invoice.subtotal || 0,
         tax: invoice.tax || 0,
         total: invoice.total,
         description: invoice.description,
@@ -719,7 +773,7 @@ async function handleInvoiceUpdated(invoice: any) {
 }
 
 // Handle payment method attached
-async function handlePaymentMethodAttached(paymentMethod: any) {
+async function handlePaymentMethodAttached(paymentMethod: { id: string; customer?: string }) {
   console.log('Payment method attached:', paymentMethod.id)
   
   try {

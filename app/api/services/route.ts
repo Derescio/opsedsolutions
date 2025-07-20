@@ -42,18 +42,18 @@ export async function GET() {
       services: services,
       addOns: services.flatMap(service => service.addOns || [])
     })
-  } catch (error: any) {
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+    const errorStack = error instanceof Error ? error.stack : 'No stack trace'
     console.error('Detailed error fetching services:', {
-      message: error.message,
-      code: error.code,
-      meta: error.meta,
-      stack: error.stack
+      message: errorMessage,
+      stack: errorStack
     })
     
     return NextResponse.json({ 
       success: false,
       error: 'Failed to fetch services',
-      details: error.stack 
+      details: errorStack 
     }, { status: 500 })
   } finally {
     await db.$disconnect()

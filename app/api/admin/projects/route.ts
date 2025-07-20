@@ -38,7 +38,11 @@ export async function GET(request: NextRequest) {
       include: {
         services: {
           include: {
-            service: true
+            service: {
+              include: {
+                category: true
+              }
+            }
           }
         },
         addOns: {
@@ -127,7 +131,11 @@ export async function POST(request: NextRequest) {
       include: {
         services: {
           include: {
-            service: true
+            service: {
+              include: {
+                category: true
+              }
+            }
           }
         },
         addOns: {

@@ -119,7 +119,17 @@ export default function PricingCalculator() {
 
         let oneTimeTotal = 0
         let recurringTotal = 0
-        const breakdown = { services: [] as any[] }
+
+        interface ServiceBreakdown {
+            service: Service
+            price: number
+            addOns: Array<{
+                addOn: ServiceAddOn
+                price: number
+            }>
+        }
+
+        const breakdown = { services: [] as ServiceBreakdown[] }
 
         selectedServices.forEach(({ service, addOns }) => {
             const servicePrice = service.basePrice

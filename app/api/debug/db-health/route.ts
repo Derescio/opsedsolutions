@@ -25,17 +25,17 @@ export async function GET() {
       timestamp: new Date().toISOString()
     })
     
-  } catch (error: any) {
-    console.error('❌ Database health check failed:', {
-      message: error.message,
-      code: error.code,
-      meta: error.meta
-    })
+  } catch (error) {
+    const errorDetails = error instanceof Error 
+      ? { message: error.message, code: 'DATABASE_ERROR' } 
+      : { message: 'Unknown database error', code: 'UNKNOWN_ERROR' }
+    
+    console.error('❌ Database health check failed:', errorDetails)
     
     return NextResponse.json({
       status: 'unhealthy',
-      error: error.message,
-      code: error.code,
+      error: errorDetails.message,
+      code: errorDetails.code,
       timestamp: new Date().toISOString()
     }, { status: 500 })
     

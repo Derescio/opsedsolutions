@@ -11,6 +11,7 @@
     "studio": "sanity dev",
     "seed-blog": "node scripts/seed-blog-data.js",
     "setup-stripe": "node scripts/setup-stripe-products.js",
+    "migrate-payments": "node scripts/migrate-project-payments.js",
     "postinstall": "npx prisma generate"
   },
   "dependencies": {

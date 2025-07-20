@@ -307,9 +307,10 @@ export default function ServiceSelector() {
             } else {
                 throw new Error(data.error || 'Failed to submit quote request')
             }
-        } catch (error: any) {
+        } catch (error) {
             console.error('Error submitting quote:', error)
-            toast.error(error.message || 'Failed to submit quote request')
+            const errorMessage = error instanceof Error ? error.message : 'Failed to submit quote request'
+            toast.error(errorMessage)
         } finally {
             setSubmitting(false)
         }

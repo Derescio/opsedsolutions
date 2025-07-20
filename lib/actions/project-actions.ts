@@ -350,7 +350,7 @@ export async function createProjectSubscriptions(projectId: string) {
           currency: 'usd',
           unit_amount: service.basePrice,
           recurring: {
-            interval: service.billingInterval as any || 'month'
+            interval: (service.billingInterval as 'day' | 'week' | 'month' | 'year') || 'month'
           },
           product_data: {
             name: service.name
