@@ -29,7 +29,10 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <ClerkProvider>
+    <ClerkProvider
+      afterSignInUrl="/dashboard"
+      afterSignUpUrl="/dashboard"
+    >
       <html lang="en" className="scroll-smooth" suppressHydrationWarning>
         <body className={`${inter.className} overflow-x-hidden`}>
           <ThemeProvider

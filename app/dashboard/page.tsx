@@ -1,6 +1,8 @@
 import { getCurrentUser } from '@/lib/auth'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import PaymentSuccessNotifier from '@/components/payment-success-notifier'
+import { Suspense } from 'react'
 import {
     User,
     Ticket,
@@ -74,6 +76,9 @@ export default async function DashboardPage() {
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-20">
+            <Suspense>
+                <PaymentSuccessNotifier />
+            </Suspense>
             <div className="container mx-auto px-4 py-8">
                 <div className="max-w-6xl mx-auto">
                     {/* Header */}

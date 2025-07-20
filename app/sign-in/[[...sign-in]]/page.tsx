@@ -1,9 +1,14 @@
 import { SignIn } from '@clerk/nextjs'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import PaymentRedirectHandler from '@/components/payment-redirect-handler'
+import { Suspense } from 'react'
 
 export default function SignInPage() {
     return (
         <div className="min-h-screen flex items-center justify-center bg-background p-4">
+            <Suspense>
+                <PaymentRedirectHandler />
+            </Suspense>
             <div className="w-full max-w-md">
                 <Card className="shadow-lg">
                     <CardHeader className="text-center">
@@ -43,7 +48,6 @@ export default function SignInPage() {
                                 }
                             }}
                             signUpUrl="/sign-up"
-                            redirectUrl="/"
                             routing="path"
                             path="/sign-in"
                         />
