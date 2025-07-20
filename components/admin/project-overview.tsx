@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import {
     DollarSign,
@@ -100,6 +101,7 @@ export default function ProjectOverview() {
     const [editForm, setEditForm] = useState({
         name: '',
         description: '',
+        status: '',
         customerInfo: {
             name: '',
             email: '',
@@ -259,6 +261,7 @@ export default function ProjectOverview() {
         setEditForm({
             name: project.name,
             description: project.description,
+            status: project.status,
             customerInfo: {
                 name: project.customerInfo?.name || '',
                 email: project.customerInfo?.email || '',
@@ -279,6 +282,7 @@ export default function ProjectOverview() {
                 body: JSON.stringify({
                     name: editForm.name,
                     description: editForm.description,
+                    status: editForm.status,
                     customerInfo: editForm.customerInfo
                 })
             })
@@ -728,6 +732,24 @@ export default function ProjectOverview() {
                                 onChange={(e) => setEditForm(prev => ({ ...prev, description: e.target.value }))}
                                 rows={3}
                             />
+                        </div>
+
+                        <div className="space-y-2">
+                            <label htmlFor="edit-status" className="text-sm font-medium">
+                                Project Status
+                            </label>
+                            <Select
+                                value={editForm.status}
+                                onValueChange={(value) => setEditForm(prev => ({ ...prev, status: value }))}
+                            >
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select status" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="COMPLETED">Completed</SelectItem>
+                                    <SelectItem value="CANCELLED">Cancelled</SelectItem>
+                                </SelectContent>
+                            </Select>
                         </div>
 
                         <div className="space-y-4">

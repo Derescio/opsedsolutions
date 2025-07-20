@@ -74,10 +74,9 @@ export const userHelpers = {
           phone: userData.phone
         }
       })
-    } catch (error) {
+    } catch (error: any) {
       // Handle unique constraint error on email (P2002)
-      const prismaError = error as { code?: string; meta?: { target?: string[] } }
-      if (prismaError.code === 'P2002' && prismaError.meta?.target?.includes('email')) {
+      if (error.code === 'P2002' && error.meta?.target?.includes('email')) {
         console.log(`User with email ${userData.email} already exists, updating with new clerkId`)
         
         // Find and update the existing user with the new clerkId
@@ -168,7 +167,7 @@ export const ticketHelpers = {
     const limit = options.limit || 10
     const skip = (page - 1) * limit
 
-    const where: Record<string, unknown> = {}
+    const where: any = {}
     if (options.status) where.status = options.status
     if (options.priority) where.priority = options.priority
     if (options.category) where.category = options.category
