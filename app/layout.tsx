@@ -32,6 +32,7 @@ export default function RootLayout({
     <ClerkProvider
       afterSignInUrl="/dashboard"
       afterSignUpUrl="/dashboard"
+      publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
     >
       <html lang="en" className="scroll-smooth" suppressHydrationWarning>
         <body className={`${inter.className} overflow-x-hidden`}>

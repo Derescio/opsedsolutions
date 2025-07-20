@@ -3,6 +3,7 @@
 import { getCurrentUser, requireAuth } from '@/lib/auth'
 import { PrismaClient } from '@/lib/generated/prisma'
 import { stripe } from '@/lib/stripe'
+import { getBaseUrl } from '@/lib/url-helper'
 // import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 
@@ -106,8 +107,8 @@ export async function createCheckoutSession(priceId: string) {
       })
     }
 
-    // Get the base URL for redirects
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+    // Get the base URL for redirects with Vercel support
+    const baseUrl = getBaseUrl()
 
     // Create checkout session
     const session = await stripe.checkout.sessions.create({
@@ -141,8 +142,8 @@ export async function createBillingPortalSession() {
       throw new Error('No customer found')
     }
 
-    // Get the base URL for redirects
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+    // Get the base URL for redirects with Vercel support
+    const baseUrl = getBaseUrl()
 
     const session = await stripe.billingPortal.sessions.create({
       customer: user.stripeCustomerId,

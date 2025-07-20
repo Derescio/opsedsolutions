@@ -4,6 +4,7 @@ import { getCurrentUser } from '@/lib/auth'
 import { PrismaClient } from '@/lib/generated/prisma'
 import { stripe } from '@/lib/stripe'
 import { HOSTING_PLANS, type HostingPlan } from '@/lib/constants/hosting-plans'
+import { getPaymentSuccessUrl, getPaymentCancelUrl } from '@/lib/url-helper'
 
 const prisma = new PrismaClient()
 
@@ -83,8 +84,8 @@ export async function createHostingSubscription(projectId: string, hostingPlanId
         price: stripePrice.id,
         quantity: 1
       }],
-      success_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/dashboard?tab=hosting&success=true&subscription=true`,
-      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/dashboard?tab=hosting&canceled=true`,
+      success_url: getPaymentSuccessUrl({ tab: 'hosting', success: true, subscription: true }),
+      cancel_url: getPaymentCancelUrl({ tab: 'hosting', canceled: true, subscription: true }),
       metadata: {
         projectId: project.id,
         hostingPlanId: hostingPlan.id,

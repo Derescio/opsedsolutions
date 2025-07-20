@@ -3,6 +3,7 @@
 import { stripe } from '@/lib/stripe'
 import { PrismaClient } from '@/lib/generated/prisma'
 import { getCurrentUser } from '@/lib/auth'
+import { getPaymentSuccessUrl, getPaymentCancelUrl } from '@/lib/url-helper'
 // import { redirect } from 'next/navigation'
 
 const prisma = new PrismaClient()
@@ -217,8 +218,8 @@ export async function createProjectPayment(projectId: string, paymentType: 'full
         },
         quantity: 1
       }],
-      success_url: `${process.env.NEXT_PUBLIC_APP_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000')}/dashboard?tab=projects&success=true&project=${project.id}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000')}/dashboard?tab=projects&canceled=true&project=${project.id}`,
+      success_url: getPaymentSuccessUrl({ tab: 'projects', success: true, project: project.id }),
+      cancel_url: getPaymentCancelUrl({ tab: 'projects', canceled: true, project: project.id }),
       metadata: {
         projectId: project.id,
         userId: user.id,
@@ -305,8 +306,8 @@ export async function createAddOnPayment(projectId: string, addOnPrice: number, 
         },
         quantity: 1
       }],
-      success_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/dashboard?tab=projects&success=true&addon=true&project=${project.id}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/dashboard?tab=projects&canceled=true&project=${project.id}`,
+      success_url: getPaymentSuccessUrl({ tab: 'projects', success: true, project: project.id, addon: true }),
+      cancel_url: getPaymentCancelUrl({ tab: 'projects', canceled: true, project: project.id }),
       metadata: {
         projectId: project.id,
         userId: user.id,

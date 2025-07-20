@@ -414,13 +414,57 @@ POST /api/admin/projects/[id]/send-quote
 }
 ```
 
+#### Update Project
+```http
+PUT /api/admin/projects/[id]
+```
+
+**Authorization**: Admin  
+**Description**: Update project details including name, description, customer info, and status
+
+**Request Body**:
+```json
+{
+  "name": "Updated Project Name",
+  "description": "Updated project description",
+  "status": "COMPLETED",
+  "customerInfo": {
+    "name": "John Doe",
+    "email": "john@example.com", 
+    "phone": "+1234567890",
+    "company": "ABC Company"
+  }
+}
+```
+
+**Response**:
+```json
+{
+  "success": true,
+  "project": {
+    "id": "proj_123",
+    "name": "Updated Project Name",
+    "description": "Updated project description", 
+    "status": "COMPLETED",
+    "customerInfo": {
+      "name": "John Doe",
+      "email": "john@example.com",
+      "phone": "+1234567890",
+      "company": "ABC Company"
+    },
+    "updatedAt": "2025-07-20T00:00:00.000Z"
+  },
+  "message": "Project updated successfully"
+}
+```
+
 #### Update Project Status
 ```http
 PUT /api/admin/projects/[id]/status
 ```
 
 **Authorization**: Admin  
-**Description**: Update project status
+**Description**: Update project status only
 
 **Request Body**:
 ```json
@@ -1102,6 +1146,6 @@ All endpoints include proper authentication, validation, error handling, and rat
 
 ---
 
-*Last Updated: July 19, 2025*  
-*API Version: 2.1 - All Systems Operational* 
+*Last Updated: July 20, 2025*  
+*API Version: 2.2 - All Systems Operational + Final Production Fixes* 
 *Status: Production Ready 🚀* 

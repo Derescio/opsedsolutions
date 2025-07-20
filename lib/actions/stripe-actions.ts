@@ -3,6 +3,7 @@
 import { stripe, STRIPE_CONFIG } from '@/lib/stripe'
 import { currentUser } from '@clerk/nextjs/server'
 import { redirect } from 'next/navigation'
+import { getBaseUrl } from '@/lib/url-helper'
 
 // Create checkout session for subscription
 export async function createCheckoutSession(priceId: string) {
@@ -144,7 +145,7 @@ export async function createCustomerPortalSession() {
 
     const session = await stripe.billingPortal.sessions.create({
       customer: customers.data[0].id,
-      return_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`,
+      return_url: `${getBaseUrl()}/dashboard`,
     })
 
     redirect(session.url)
