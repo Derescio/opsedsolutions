@@ -114,7 +114,7 @@ export async function createProject(projectData: ProjectRequest) {
   }
 }
 
-export async function createProjectPayment(projectId: string, paymentType: 'full' | 'deposit' = 'deposit') {
+export async function createProjectPayment(projectId: string, paymentType: 'full' | 'deposit' | 'remaining' = 'deposit') {
   try {
     const user = await getCurrentUser()
     if (!user) {
@@ -167,7 +167,23 @@ export async function createProjectPayment(projectId: string, paymentType: 'full
 
     // Calculate payment amount
     const fullAmount = project.totalAmount
-    const paymentAmount = paymentType === 'full' ? fullAmount : Math.round(fullAmount * 0.5) // 50% deposit
+    const paidAmount = project.paidAmount
+    let paymentAmount: number
+    
+    if (paymentType === 'full') {
+        paymentAmount = fullAmount
+    } else if (paymentType === 'deposit') {
+        paymentAmount = Math.round(fullAmount * 0.5) // 50% deposit
+    } else if (paymentType === 'remaining') {
+        paymentAmount = fullAmount - paidAmount // Remaining balance
+    } else {
+        throw new Error('Invalid payment type')
+    }
+
+    // Ensure payment amount is positive
+    if (paymentAmount <= 0) {
+        throw new Error('Payment amount must be greater than zero')
+    }
 
     // Create payment intent
     const paymentIntent = await stripe.paymentIntents.create({
@@ -180,7 +196,7 @@ export async function createProjectPayment(projectId: string, paymentType: 'full
         paymentType,
         fullAmount: fullAmount.toString()
       },
-      description: `${paymentType === 'full' ? 'Full payment' : 'Deposit'} for ${project.name}`
+      description: `${paymentType === 'full' ? 'Full payment' : paymentType === 'deposit' ? 'Deposit' : 'Remaining payment'} for ${project.name}`
     })
 
     // Create checkout session
@@ -194,15 +210,15 @@ export async function createProjectPayment(projectId: string, paymentType: 'full
         price_data: {
           currency: 'usd',
           product_data: {
-            name: `${project.name} - ${paymentType === 'full' ? 'Full Payment' : 'Deposit'}`,
+            name: `${project.name} - ${paymentType === 'full' ? 'Full Payment' : paymentType === 'deposit' ? 'Deposit' : 'Remaining Payment'}`,
             description: project.description || 'Web development project'
           },
           unit_amount: paymentAmount
         },
         quantity: 1
       }],
-      success_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/dashboard?tab=projects&success=true&project=${project.id}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/dashboard?tab=projects&canceled=true&project=${project.id}`,
+      success_url: `${process.env.NEXT_PUBLIC_APP_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000')}/dashboard?tab=projects&success=true&project=${project.id}`,
+      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000')}/dashboard?tab=projects&canceled=true&project=${project.id}`,
       metadata: {
         projectId: project.id,
         userId: user.id,

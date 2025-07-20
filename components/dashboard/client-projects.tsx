@@ -180,7 +180,7 @@ export default function ClientProjects() {
         }
     }
 
-    const handleMakePayment = async (projectId: string, paymentType: 'deposit' | 'full') => {
+    const handleMakePayment = async (projectId: string, paymentType: 'deposit' | 'full' | 'remaining') => {
         try {
             setPaymentLoading(true)
             const result = await createProjectPayment(projectId, paymentType)
@@ -444,7 +444,7 @@ export default function ClientProjects() {
                                     {project.status === 'IN_PROGRESS' && project.paidAmount < project.totalAmount && (
                                         <Button
                                             size="sm"
-                                            onClick={() => handleMakePayment(project.id, 'full')}
+                                            onClick={() => handleMakePayment(project.id, 'remaining')}
                                             disabled={paymentLoading}
                                         >
                                             Pay Remaining
