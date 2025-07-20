@@ -47,6 +47,12 @@ export async function PATCH(
 
     // TODO: Send email notification to client about status change
     interface ProjectMetadata {
+      contactInfo?: {
+        name?: string
+        email?: string
+        phone?: string
+        company?: string
+      }
       customerInfo?: {
         name?: string
         email?: string
@@ -55,7 +61,7 @@ export async function PATCH(
       }
       [key: string]: unknown
     }
-    const customerInfo = (project.metadata as ProjectMetadata)?.customerInfo || {}
+    const customerInfo = (project.metadata as ProjectMetadata)?.contactInfo || (project.metadata as ProjectMetadata)?.customerInfo || {}
     console.log(`Project status updated to ${status} for ${customerInfo.email}`)
 
     // TODO: Create activity log entry

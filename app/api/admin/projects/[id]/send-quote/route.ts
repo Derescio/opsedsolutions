@@ -56,6 +56,12 @@ export async function POST(
     // TODO: Send email notification to client
     // This would integrate with your email service (SendGrid, Resend, etc.)
     interface ProjectMetadata {
+      contactInfo?: {
+        name?: string
+        email?: string
+        phone?: string
+        company?: string
+      }
       customerInfo?: {
         name?: string
         email?: string
@@ -64,7 +70,7 @@ export async function POST(
       }
       [key: string]: unknown
     }
-    const customerInfo = (project.metadata as ProjectMetadata)?.customerInfo || {}
+    const customerInfo = (project.metadata as ProjectMetadata)?.contactInfo || (project.metadata as ProjectMetadata)?.customerInfo || {}
     console.log(`Quote sent to ${customerInfo.email} for project: ${project.name}`)
 
     // TODO: Create activity log entry

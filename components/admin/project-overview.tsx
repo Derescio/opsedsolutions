@@ -52,6 +52,7 @@ interface Project {
     customerInfo: {
         name: string
         email: string
+        phone?: string
         company?: string
     }
     createdAt: string
@@ -91,6 +92,20 @@ export default function ProjectOverview() {
     const [quoteForm, setQuoteForm] = useState({
         notes: '',
         validUntilDays: 30
+    })
+
+    // Edit dialog state
+    const [editDialogOpen, setEditDialogOpen] = useState(false)
+    const [editingProject, setEditingProject] = useState<Project | null>(null)
+    const [editForm, setEditForm] = useState({
+        name: '',
+        description: '',
+        customerInfo: {
+            name: '',
+            email: '',
+            phone: '',
+            company: ''
+        }
     })
 
     useEffect(() => {
@@ -236,6 +251,49 @@ export default function ProjectOverview() {
         } catch (error) {
             console.error('Error updating status:', error)
             toast.error('Failed to update status')
+        }
+    }
+
+    const handleEditProject = (project: Project) => {
+        setEditingProject(project)
+        setEditForm({
+            name: project.name,
+            description: project.description,
+            customerInfo: {
+                name: project.customerInfo?.name || '',
+                email: project.customerInfo?.email || '',
+                phone: project.customerInfo?.phone || '',
+                company: project.customerInfo?.company || ''
+            }
+        })
+        setEditDialogOpen(true)
+    }
+
+    const handleSubmitEdit = async () => {
+        if (!editingProject) return
+
+        try {
+            const response = await fetch(`/api/admin/projects/${editingProject.id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: editForm.name,
+                    description: editForm.description,
+                    customerInfo: editForm.customerInfo
+                })
+            })
+
+            if (response.ok) {
+                toast.success('Project updated successfully!')
+                fetchData()
+                setEditDialogOpen(false)
+                setEditingProject(null)
+            } else {
+                toast.error('Failed to update project')
+            }
+        } catch (error) {
+            console.error('Error updating project:', error)
+            toast.error('Failed to update project')
         }
     }
 
@@ -568,7 +626,7 @@ export default function ProjectOverview() {
                             <Button onClick={() => handleSendQuote(selectedProject)}>
                                 Send Quote
                             </Button>
-                            <Button variant="outline">
+                            <Button variant="outline" onClick={() => handleEditProject(selectedProject)}>
                                 Edit Project
                             </Button>
                             <Button variant="outline">
@@ -633,6 +691,118 @@ export default function ProjectOverview() {
                         >
                             <Send className="w-4 h-4 mr-2" />
                             Send Quote
+                        </Button>
+                    </div>
+                </DialogContent>
+            </Dialog>
+
+            {/* Edit Project Dialog */}
+            <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+                <DialogContent className="sm:max-w-[525px]">
+                    <DialogHeader>
+                        <DialogTitle>Edit Project</DialogTitle>
+                        <DialogDescription>
+                            Update project details for &quot;{editingProject?.name}&quot;
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    <div className="space-y-4 py-4">
+                        <div className="space-y-2">
+                            <label htmlFor="edit-name" className="text-sm font-medium">
+                                Project Name
+                            </label>
+                            <Input
+                                id="edit-name"
+                                value={editForm.name}
+                                onChange={(e) => setEditForm(prev => ({ ...prev, name: e.target.value }))}
+                            />
+                        </div>
+
+                        <div className="space-y-2">
+                            <label htmlFor="edit-description" className="text-sm font-medium">
+                                Description
+                            </label>
+                            <Textarea
+                                id="edit-description"
+                                value={editForm.description}
+                                onChange={(e) => setEditForm(prev => ({ ...prev, description: e.target.value }))}
+                                rows={3}
+                            />
+                        </div>
+
+                        <div className="space-y-4">
+                            <h4 className="text-sm font-medium">Customer Information</h4>
+
+                            <div className="grid grid-cols-2 gap-3">
+                                <div className="space-y-2">
+                                    <label htmlFor="edit-customer-name" className="text-sm font-medium">
+                                        Name
+                                    </label>
+                                    <Input
+                                        id="edit-customer-name"
+                                        value={editForm.customerInfo.name}
+                                        onChange={(e) => setEditForm(prev => ({
+                                            ...prev,
+                                            customerInfo: { ...prev.customerInfo, name: e.target.value }
+                                        }))}
+                                    />
+                                </div>
+
+                                <div className="space-y-2">
+                                    <label htmlFor="edit-customer-email" className="text-sm font-medium">
+                                        Email
+                                    </label>
+                                    <Input
+                                        id="edit-customer-email"
+                                        type="email"
+                                        value={editForm.customerInfo.email}
+                                        onChange={(e) => setEditForm(prev => ({
+                                            ...prev,
+                                            customerInfo: { ...prev.customerInfo, email: e.target.value }
+                                        }))}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-3">
+                                <div className="space-y-2">
+                                    <label htmlFor="edit-customer-phone" className="text-sm font-medium">
+                                        Phone (Optional)
+                                    </label>
+                                    <Input
+                                        id="edit-customer-phone"
+                                        type="tel"
+                                        value={editForm.customerInfo.phone}
+                                        onChange={(e) => setEditForm(prev => ({
+                                            ...prev,
+                                            customerInfo: { ...prev.customerInfo, phone: e.target.value }
+                                        }))}
+                                    />
+                                </div>
+
+                                <div className="space-y-2">
+                                    <label htmlFor="edit-customer-company" className="text-sm font-medium">
+                                        Company (Optional)
+                                    </label>
+                                    <Input
+                                        id="edit-customer-company"
+                                        value={editForm.customerInfo.company}
+                                        onChange={(e) => setEditForm(prev => ({
+                                            ...prev,
+                                            customerInfo: { ...prev.customerInfo, company: e.target.value }
+                                        }))}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="flex justify-end gap-3">
+                        <Button variant="outline" onClick={() => setEditDialogOpen(false)}>
+                            Cancel
+                        </Button>
+                        <Button onClick={handleSubmitEdit} disabled={!editingProject}>
+                            Update Project
                         </Button>
                     </div>
                 </DialogContent>

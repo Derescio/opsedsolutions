@@ -4,7 +4,6 @@ import { PrismaClient } from '@/lib/generated/prisma'
 
 const prisma = new PrismaClient()
 
-// TypeScript interfaces for project data
 interface CustomerInfo {
   name?: string
   email?: string
@@ -23,21 +22,20 @@ interface ProjectMetadata {
   [key: string]: unknown
 }
 
-interface ServiceInput {
-  serviceId: string
-  customPrice?: number
-  notes?: string
-}
-
-export async function GET(request: NextRequest) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
-    // Check if user is authenticated and is admin
     const user = await getCurrentUser()
     if (!user || user.role !== 'ADMIN') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const projects = await prisma.project.findMany({
+    const { id: projectId } = await params
+
+    const project = await prisma.project.findUnique({
+      where: { id: projectId },
       include: {
         services: {
           include: {
@@ -55,11 +53,14 @@ export async function GET(request: NextRequest) {
         },
         payments: true,
         subscriptions: true
-      },
-      orderBy: { updatedAt: 'desc' }
+      }
     })
 
-    const formattedProjects = projects.map(project => ({
+    if (!project) {
+      return NextResponse.json({ error: 'Project not found' }, { status: 404 })
+    }
+
+    const formattedProject = {
       id: project.id,
       name: project.name,
       description: project.description,
@@ -76,14 +77,14 @@ export async function GET(request: NextRequest) {
       addOns: project.addOns,
       payments: project.payments,
       subscriptions: project.subscriptions
-    }))
+    }
 
     return NextResponse.json({ 
       success: true, 
-      projects: formattedProjects 
+      project: formattedProject 
     })
   } catch (error) {
-    console.error('Error fetching admin projects:', error)
+    console.error('Error fetching project:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -91,44 +92,50 @@ export async function GET(request: NextRequest) {
   }
 }
 
-export async function POST(request: NextRequest) {
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
-    // Check if user is authenticated and is admin
     const user = await getCurrentUser()
     if (!user || user.role !== 'ADMIN') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { name, description, status, totalAmount, customerInfo, services } = await request.json()
+    const { id: projectId } = await params
+    const body = await request.json()
+    const { name, description, totalAmount, customerInfo, status } = body
 
     // Validate required fields
-    if (!name || !description || !customerInfo?.email) {
+    if (!name || !description) {
       return NextResponse.json(
-        { error: 'Missing required fields' },
+        { error: 'Name and description are required' },
         { status: 400 }
       )
     }
 
-    const project = await prisma.project.create({
+    // Get the current project to merge metadata
+    const currentProject = await prisma.project.findUnique({
+      where: { id: projectId }
+    })
+
+    if (!currentProject) {
+      return NextResponse.json({ error: 'Project not found' }, { status: 404 })
+    }
+
+    const currentMetadata = currentProject.metadata as ProjectMetadata || {}
+    
+    // Update project
+    const updatedProject = await prisma.project.update({
+      where: { id: projectId },
       data: {
         name,
         description,
-        status,
-        totalAmount,
-        paidAmount: 0,
-        userId: user.id,
-        contractSigned: false,
-        quoteValidUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
+        ...(totalAmount && { totalAmount }),
+        ...(status && { status }),
         metadata: {
-          customerInfo,
-          requirements: ''
-        },
-        services: {
-          create: services.map((service: ServiceInput) => ({
-            serviceId: service.serviceId,
-            customPrice: service.customPrice || 0,
-            notes: service.notes
-          }))
+          ...currentMetadata,
+          contactInfo: customerInfo || currentMetadata.contactInfo || currentMetadata.customerInfo
         }
       },
       include: {
@@ -151,12 +158,32 @@ export async function POST(request: NextRequest) {
       }
     })
 
+    const formattedProject = {
+      id: updatedProject.id,
+      name: updatedProject.name,
+      description: updatedProject.description,
+      status: updatedProject.status,
+      totalAmount: updatedProject.totalAmount,
+      paidAmount: updatedProject.paidAmount,
+      customerInfo: (updatedProject.metadata as ProjectMetadata)?.contactInfo || (updatedProject.metadata as ProjectMetadata)?.customerInfo || {},
+      createdAt: updatedProject.createdAt.toISOString(),
+      updatedAt: updatedProject.updatedAt.toISOString(),
+      quoteValidUntil: updatedProject.quoteValidUntil?.toISOString(),
+      contractSigned: updatedProject.contractSigned,
+      contractDate: updatedProject.contractDate?.toISOString(),
+      services: updatedProject.services,
+      addOns: updatedProject.addOns,
+      payments: updatedProject.payments,
+      subscriptions: updatedProject.subscriptions
+    }
+
     return NextResponse.json({ 
       success: true, 
-      project 
+      project: formattedProject,
+      message: 'Project updated successfully'
     })
   } catch (error) {
-    console.error('Error creating project:', error)
+    console.error('Error updating project:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
