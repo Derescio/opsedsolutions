@@ -5,22 +5,22 @@ import { Mail, MapPin, Linkedin, Github, Twitter, ArrowUp } from "lucide-react"
 
 const footerLinks = {
     services: [
-        { name: "Web Development", href: "#services" },
-        { name: "Data Analytics", href: "#services" },
-        { name: "System Optimization", href: "#services" },
-        { name: "Technical Consulting", href: "#services" }
+        { name: "Web Development", href: "/services" },
+        { name: "Data Analytics", href: "/services" },
+        { name: "System Optimization", href: "/services" },
+        { name: "Technical Consulting", href: "/services" }
     ],
     company: [
-        { name: "About", href: "#about" },
-        { name: "Projects", href: "#projects" },
-        { name: "Contact", href: "#contact" },
-        { name: "Blog", href: "#" }
+        { name: "About", href: "/about" },
+        { name: "Projects", href: "/projects" },
+        { name: "Contact", href: "/contact" },
+        { name: "Blog", href: "/blog" }
     ],
     resources: [
-        { name: "Case Studies", href: "#projects" },
-        { name: "Tech Stack", href: "#about" },
-        { name: "Privacy Policy", href: "#" },
-        { name: "Terms of Service", href: "#" }
+        { name: "Case Studies", href: "/projects" },
+        { name: "Tech Stack", href: "/about" },
+        { name: "Privacy Policy", href: "/privacy-policy" },
+        { name: "Terms of Service", href: "/terms" }
     ]
 }
 

@@ -57,8 +57,7 @@ export default function Hero() {
               </h1>
 
               <p className="text-base sm:text-lg md:text-xl text-gray-700 dark:text-white dark:font-light mb-8 max-w-2xl leading-relaxed mx-auto lg:mx-0">
-                Full-stack development meets advanced data analytics. I transform complex business challenges into
-                scalable web solutions backed by data-driven insights.
+                From startups to enterprises, OPSED delivers scalable digital solutions through expert web development and intelligent, data-powered decision-making.
               </p>
             </div>
 

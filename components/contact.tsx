@@ -45,8 +45,8 @@ const services = [
   "System Architecture & Optimization",
   "API Development & Integration",
   "Database Design & Management",
-  "Machine Learning Implementation",
-  "Performance Optimization",
+  "UX/UI Design",
+  "UX/UI Auditing",
   "Technical Consulting"
 ]
 
@@ -295,14 +295,14 @@ export default function Contact() {
                       <Send className="w-4 h-4 mr-2" />
                       {isSubmitting ? 'Sending...' : 'Send Message'}
                     </Button>
-                    <Button
+                    {/* <Button
                       type="button"
                       variant="outline"
                       className="flex-1 border-[#32cf37] text-[#32cf37] hover:bg-[#32cf37] hover:text-white py-3 px-6 rounded-lg transition-all duration-200 flex items-center justify-center"
                     >
                       <Calendar className="w-4 h-4 mr-2" />
                       Schedule Call
-                    </Button>
+                    </Button> */}
                   </div>
 
 

@@ -1,11 +1,10 @@
 import React from 'react'
+import AboutPage from '@/components/about-page'
 
-const About = () => {
+export default function AboutPageComponent() {
     return (
         <div>
-            About page
+            <AboutPage />
         </div>
     )
 }
-
-export default About

@@ -22,21 +22,21 @@ const Navbar = () => {
             { name: 'Home', href: '/' },
             {
                 name: 'Projects',
-                href: isHomepage ? '#projects' : '/projects'
+                href: isHomepage ? '/projects' : '/projects'
             },
             {
                 name: 'Services',
-                href: isHomepage ? '#services' : '/services'
+                href: isHomepage ? '/services' : '/services'
             },
             {
                 name: 'About',
-                href: isHomepage ? '#about' : '/about'
+                href: isHomepage ? '/about' : '/about'
             },
             { name: 'Blog', href: '/blog' },
             // { name: 'Studio', href: '/studio' },
             {
                 name: 'Contact',
-                href: isHomepage ? '#contact' : '/#contact'
+                href: isHomepage ? '/contact' : '/contact'
             },
         ]
 

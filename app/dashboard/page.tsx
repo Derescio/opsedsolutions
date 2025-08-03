@@ -65,10 +65,10 @@ export default async function DashboardPage() {
         }
     }) : []
 
-    const roleStats = userStats.reduce((acc, stat) => {
-        acc[stat.role] = stat._count.id
-        return acc
-    }, {} as Record<string, number>)
+    // const roleStats = userStats.reduce((acc, stat) => {
+    //     acc[stat.role] = stat._count.id
+    //     return acc
+    // }, {} as Record<string, number>)
 
     // Get tickets from database using server action
     const ticketResult = await getTickets()

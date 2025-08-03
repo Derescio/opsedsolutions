@@ -1,6 +1,8 @@
 // //import '@/app/assets/styles/globals.css'
 // import Navbar from "@/components/navbar"
 // import Footer from "@/components/footer"
+import { ThemeProvider } from "@/components/theme-provider"
+import ThemePopup from "@/components/ThemePopup"
 
 
 export default function RootLayout({
@@ -15,7 +17,15 @@ export default function RootLayout({
                 {/* <Navbar /> */}
 
                 <main>
-                    {children}
+                    <ThemePopup />
+                    <ThemeProvider
+                        attribute="class"
+                        defaultTheme="light"
+                        enableSystem
+                        disableTransitionOnChange
+                    >
+                        {children}
+                    </ThemeProvider>
                 </main>
                 {/* </SessionProvider> */}
                 {/* <Footer /> */}

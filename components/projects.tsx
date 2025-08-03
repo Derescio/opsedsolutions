@@ -206,9 +206,9 @@ export default function Projects() {
   const [activeTab, setActiveTab] = useState<'all' | 'web' | 'data'>('all')
 
   const tabs = [
-    { id: 'all', label: 'All Projects', count: webProjects.length + dataProjects.length },
-    { id: 'web', label: 'Web Development', count: webProjects.length },
-    { id: 'data', label: 'Data Analytics', count: dataProjects.length },
+    { id: 'all', label: 'Sample Projects', count: webProjects.length },
+    // { id: 'web', label: 'Web Development', count: webProjects.length },
+    // { id: 'data', label: 'Data Analytics', count: dataProjects.length },
   ]
 
   return (
@@ -277,7 +277,7 @@ export default function Projects() {
           )}
 
           {/* Data Analytics Projects */}
-          {(activeTab === 'all' || activeTab === 'data') && (
+          {/* {(activeTab === 'all' || activeTab === 'data') && (
             <div>
               <div className="flex items-center justify-center mb-8">
                 <div className="flex items-center space-x-3">
@@ -295,7 +295,7 @@ export default function Projects() {
                 ))}
               </div>
             </div>
-          )}
+          )} */}
         </div>
 
         {/* Bottom CTA */}
