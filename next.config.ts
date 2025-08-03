@@ -24,7 +24,7 @@ const nextConfig: NextConfig = {
     // domains: ['cdn.sanity.io'],
   },
   transpilePackages: ['next-sanity'],
-  darkMode: 'class',
+  // darkMode: 'class',
 };
 
 export default nextConfig;
