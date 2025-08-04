@@ -24,7 +24,7 @@ export default function ThemePopup() {
 
     return (
         <div className="fixed bottom-6 right-6 z-50 max-w-sm rounded-xl backdrop-blur-lg bg-white/30 dark:bg-black/30 border border-white/20 shadow-xl p-4 text-sm">
-            <div className="mb-2 font-medium">You can change the theme of the website to suit your viewing needs. You can also do so from the navigation bar.</div>
+            <div className="mb-2 font-medium">You can change the theme of the website to suit your viewing needs. You can also do so from the navigation bar.  </div>
             <div className="flex justify-between items-center gap-2">
                 <button
                     onClick={() => setTheme('light')}
