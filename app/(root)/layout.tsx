@@ -5,6 +5,7 @@
 import { useEffect, useState } from "react";
 import { ThemeProvider } from "@/components/theme-provider"
 import ThemePopup from "@/components/ThemePopup"
+import { GoogleAnalytics } from '@next/third-parties/google';
 
 
 export default function RootLayout({
@@ -38,6 +39,7 @@ export default function RootLayout({
                     >
                         {children}
                     </ThemeProvider>
+                    <GoogleAnalytics gaId={process.env.GOOGLE_TAG_ID || ''} />
                 </main>
                 {/* </SessionProvider> */}
                 {/* <Footer /> */}

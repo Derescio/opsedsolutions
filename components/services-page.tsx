@@ -8,16 +8,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
     Code,
-    Cloud,
     BarChart3,
     Zap,
-    Smartphone,
     CheckCircle,
     ArrowRight,
     Settings,
-    Users,
     Globe,
-    Brain,
     Search,
     Filter,
     Star,
@@ -27,7 +23,9 @@ import {
     DollarSign,
     ShoppingCart,
     Headphones,
-    LucideIcon
+    LucideIcon,
+    Paintbrush,
+    ClipboardList
 } from "lucide-react"
 import Link from "next/link"
 import React, { useState, useMemo } from "react"
@@ -66,8 +64,8 @@ const allServices: Service[] = [
     // Web Development Services
     {
         id: "custom-web-apps",
-        name: "Custom Web Applications",
-        shortDescription: "Scalable, responsive web applications built with modern frameworks",
+        name: "Custom Website Development",
+        shortDescription: "Scalable, responsive web applications built with modern frameworks.",
         description: "Full-stack web applications tailored to your business needs, built with cutting-edge technologies for optimal performance and user experience.",
         category: "Web Development",
         subcategory: "Full-Stack Development",
@@ -75,7 +73,7 @@ const allServices: Service[] = [
         features: ["React/Next.js", "TypeScript", "Responsive Design", "Performance Optimization", "SEO Ready", "PWA Support"],
         technologies: ["React", "Next.js", "TypeScript", "Tailwind CSS", "Node.js", "PostgreSQL"],
         deliverables: ["Source Code", "Documentation", "Deployment Guide", "Training Session"],
-        timeline: "4-12 weeks",
+        timeline: "4-6 weeks",
         tiers: [
             {
                 name: "Starter",
@@ -194,72 +192,156 @@ const allServices: Service[] = [
         ]
     },
 
-    // Mobile Development
+    // UI Research and Design
     {
-        id: "mobile-app-development",
-        name: "Mobile App Development",
-        shortDescription: "Native and cross-platform mobile applications for iOS and Android",
-        description: "Custom mobile applications built with React Native and Flutter for seamless cross-platform experience.",
-        category: "Mobile Development",
-        subcategory: "Cross-Platform Apps",
-        icon: Smartphone,
-        features: ["Cross-Platform", "Native Performance", "Push Notifications", "Offline Support", "App Store Deployment", "Backend Integration"],
-        technologies: ["React Native", "Flutter", "Firebase", "Expo", "App Store Connect", "Google Play Console"],
-        deliverables: ["Mobile App", "Backend API", "App Store Submission", "Documentation"],
-        timeline: "8-20 weeks",
+        id: "ui-research-design",
+        name: "UI Research and Design",
+        shortDescription: "Rapid UI research, wireframing, and visual design for websites or apps",
+        description: "User-centered design process including research, wireframes, and high-fidelity UI mockups tailored to your brand and product goals.",
+        category: "Design",
+        subcategory: "UI/UX Design",
+        icon: Paintbrush,
+        features: [
+            "User Research",
+            "Wireframes",
+            "UI Design",
+            "Design Systems",
+            "Responsive Layouts",
+            "Developer Handoff"
+        ],
+        technologies: ["Figma", "Miro", "Notion", "Lottie", "Adobe Illustrator"],
+        deliverables: ["Wireframes", "UI Mockups", "Design System", "Interaction Guidelines"],
+        timeline: "4–7 days",
         tiers: [
             {
-                name: "MVP App",
-                price: "$8,000",
-                duration: "8-12 weeks",
-                description: "Minimum viable product for testing your concept",
+                name: "Starter Package",
+                price: "$500",
+                duration: "4–5 days",
+                description: "UI wireframes and basic visual design for small apps or websites",
                 features: [
-                    { name: "Core Features (3-5)", included: true },
-                    { name: "Basic UI/UX", included: true },
-                    { name: "User Authentication", included: true },
-                    { name: "App Store Submission", included: true },
-                    { name: "Basic Analytics", included: true },
-                    { name: "Push Notifications", included: false },
-                    { name: "Offline Support", included: false },
-                    { name: "Advanced Features", included: false }
+                    { name: "1–2 Screens", included: true },
+                    { name: "Basic Research", included: true },
+                    { name: "Wireframes", included: true },
+                    { name: "Basic UI Design", included: true },
+                    { name: "Design Handoff (Figma)", included: true },
+                    { name: "Component Library", included: false },
+                    { name: "Advanced Prototyping", included: false }
                 ]
             },
             {
-                name: "Full Featured App",
-                price: "$15,000",
-                duration: "12-16 weeks",
-                description: "Complete mobile app with advanced features",
+                name: "Professional Package",
+                price: "$1,200",
+                duration: "5–6 days",
+                description: "Full UI kit and research-based designs for MVPs or corporate sites",
                 popular: true,
                 features: [
-                    { name: "All Features", included: true },
-                    { name: "Custom UI/UX", included: true },
-                    { name: "User Authentication", included: true },
-                    { name: "App Store Submission", included: true },
-                    { name: "Advanced Analytics", included: true },
-                    { name: "Push Notifications", included: true },
-                    { name: "Offline Support", included: true },
-                    { name: "Payment Integration", included: false }
+                    { name: "3–6 Screens", included: true },
+                    { name: "User Personas", included: true },
+                    { name: "Wireframes + UI Design", included: true },
+                    { name: "Style Guide", included: true },
+                    { name: "Design System", included: true },
+                    { name: "Component Library", included: true },
+                    { name: "Basic Prototyping", included: true },
+                    { name: "Developer Notes", included: true }
                 ]
             },
             {
-                name: "Enterprise App",
+                name: "Enterprise Package",
                 price: "Custom",
-                duration: "16-20 weeks",
-                description: "Enterprise-grade mobile solution",
+                duration: "6–7 days",
+                description: "End-to-end UI/UX research and design for high-complexity platforms",
                 features: [
-                    { name: "Unlimited Features", included: true },
-                    { name: "Enterprise UI/UX", included: true },
-                    { name: "Advanced Authentication", included: true },
-                    { name: "App Store Management", included: true },
-                    { name: "Enterprise Analytics", included: true },
-                    { name: "Advanced Notifications", included: true },
-                    { name: "Full Offline Support", included: true },
-                    { name: "Full Payment Integration", included: true }
+                    { name: "Unlimited Screens", included: true },
+                    { name: "Deep User Research", included: true },
+                    { name: "UX Strategy Documentation", included: true },
+                    { name: "Component Library", included: true },
+                    { name: "Full Design System", included: true },
+                    { name: "Motion Prototypes", included: true },
+                    { name: "Dev-ready Exports", included: true },
+                    { name: "Follow-up Revisions", included: true }
                 ]
             }
         ]
     },
-
+    // UX Research and Design
+    {
+        id: "ux-research-design",
+        name: "UX Research & Design",
+        shortDescription: "Rapid UX research, wireframing, and usability testing for product clarity and user flow optimization.",
+        description: "A focused UX sprint including stakeholder discovery, usability testing plans, wireframes, and high-fidelity UI design to improve digital experiences. Ideal for MVPs, redesigns, or new features.",
+        category: "Design & Strategy",
+        subcategory: "UX Design",
+        icon: ClipboardList,
+        features: [
+            "Stakeholder Discovery",
+            "UX Audit & Competitive Analysis",
+            "Usability Testing Plan",
+            "Wireframes & UI Design",
+            "User Personas & Journeys",
+            "Developer Handoff Documentation"
+        ],
+        technologies: ["Figma", "Notion", "Maze", "Miro", "Google Forms"],
+        deliverables: [
+            "Usability Test Plan",
+            "Interview Notes",
+            "Wireframes",
+            "UI Mockups",
+            "Design System",
+            "Developer Handoff Guide"
+        ],
+        timeline: "4–7 days",
+        tiers: [
+            {
+                name: "Rapid UX Sprint",
+                price: "$500",
+                duration: "4 days",
+                description: "Quick UX analysis and UI concept for early-stage validation",
+                features: [
+                    { name: "1 Stakeholder Interview", included: true },
+                    { name: "Mini UX Audit", included: true },
+                    { name: "Usability Test Plan (Basic)", included: true },
+                    { name: "2–3 Wireframes", included: true },
+                    { name: "Basic UI Styling", included: true },
+                    { name: "Prototype Link", included: false },
+                    { name: "Design System", included: false },
+                    { name: "User Journey Map", included: false }
+                ]
+            },
+            {
+                name: "Standard UX Package",
+                price: "$1,000",
+                duration: "5–6 days",
+                description: "In-depth UX testing, UI design, and user journey optimization",
+                popular: true,
+                features: [
+                    { name: "2–3 Stakeholder Interviews", included: true },
+                    { name: "UX Audit + Heuristic Evaluation", included: true },
+                    { name: "Usability Test Plan & Task Script", included: true },
+                    { name: "5–7 Wireframes", included: true },
+                    { name: "High-Fidelity UI Designs", included: true },
+                    { name: "Developer Handoff Docs", included: true },
+                    { name: "Design System (Lite)", included: true },
+                    { name: "User Personas + Journey Maps", included: false }
+                ]
+            },
+            {
+                name: "UX Strategy & Design System",
+                price: "Custom",
+                duration: "6–7 days",
+                description: "Full research, UX testing, and atomic design system for scalable design",
+                features: [
+                    { name: "Unlimited Interviews & Research", included: true },
+                    { name: "Full UX Audit & Competitive Benchmarking", included: true },
+                    { name: "Advanced Usability Testing Framework", included: true },
+                    { name: "UI + UX Strategy Deck", included: true },
+                    { name: "Component-Based Design System", included: true },
+                    { name: "Design Tokens & Figma Libraries", included: true },
+                    { name: "Journey Mapping & Behavioral Segments", included: true },
+                    { name: "Post-launch Test Plan", included: true }
+                ]
+            }
+        ]
+    },
     // Data Analytics Services
     {
         id: "business-intelligence",
@@ -326,203 +408,7 @@ const allServices: Service[] = [
         ]
     },
 
-    // AI & Machine Learning
-    {
-        id: "ai-chatbot",
-        name: "AI Chatbot Development",
-        shortDescription: "Intelligent conversational AI for customer service and engagement",
-        description: "Custom AI chatbots with natural language processing, multi-language support, and seamless human handoff capabilities.",
-        category: "AI & Machine Learning",
-        subcategory: "Conversational AI",
-        icon: Brain,
-        features: ["Natural Language Processing", "Multi-language Support", "Human Handoff", "Integration Ready", "Analytics Dashboard", "Continuous Learning"],
-        technologies: ["OpenAI GPT", "Python", "FastAPI", "WebSocket", "React", "PostgreSQL"],
-        deliverables: ["AI Chatbot", "Admin Dashboard", "Integration Guide", "Training Data"],
-        timeline: "6-12 weeks",
-        tiers: [
-            {
-                name: "Basic Bot",
-                price: "$3,500",
-                duration: "6-8 weeks",
-                description: "Simple chatbot for common inquiries",
-                features: [
-                    { name: "FAQ Automation", included: true },
-                    { name: "Basic NLP", included: true },
-                    { name: "Web Integration", included: true },
-                    { name: "Basic Analytics", included: true },
-                    { name: "Human Handoff", included: true },
-                    { name: "Multi-language", included: false },
-                    { name: "Advanced AI", included: false },
-                    { name: "Voice Support", included: false }
-                ]
-            },
-            {
-                name: "Smart Assistant",
-                price: "$7,000",
-                duration: "8-10 weeks",
-                description: "Advanced AI assistant with learning capabilities",
-                popular: true,
-                features: [
-                    { name: "Advanced Conversations", included: true },
-                    { name: "Advanced NLP", included: true },
-                    { name: "Multi-platform Integration", included: true },
-                    { name: "Detailed Analytics", included: true },
-                    { name: "Smart Human Handoff", included: true },
-                    { name: "Multi-language", included: true },
-                    { name: "Learning AI", included: true },
-                    { name: "Voice Support", included: false }
-                ]
-            },
-            {
-                name: "Enterprise AI",
-                price: "Custom",
-                duration: "10-12 weeks",
-                description: "Enterprise AI assistant with custom training",
-                features: [
-                    { name: "Custom AI Training", included: true },
-                    { name: "Enterprise NLP", included: true },
-                    { name: "Omnichannel Integration", included: true },
-                    { name: "Enterprise Analytics", included: true },
-                    { name: "Advanced Workflows", included: true },
-                    { name: "Multi-language Pro", included: true },
-                    { name: "Self-improving AI", included: true },
-                    { name: "Full Voice Support", included: true }
-                ]
-            }
-        ]
-    },
 
-    // DevOps & Cloud Services
-    {
-        id: "cloud-infrastructure",
-        name: "Cloud Infrastructure & DevOps",
-        shortDescription: "Scalable cloud solutions with automated deployment and monitoring",
-        description: "Complete cloud infrastructure setup with CI/CD pipelines, monitoring, security, and automated scaling.",
-        category: "DevOps & Cloud",
-        subcategory: "Infrastructure",
-        icon: Cloud,
-        features: ["AWS/Azure/GCP", "CI/CD Pipelines", "Monitoring", "Auto-scaling", "Security", "Backup & Recovery"],
-        technologies: ["AWS", "Docker", "Kubernetes", "Terraform", "Jenkins", "Prometheus"],
-        deliverables: ["Cloud Architecture", "CI/CD Setup", "Monitoring Dashboard", "Documentation"],
-        timeline: "4-10 weeks",
-        tiers: [
-            {
-                name: "Basic Setup",
-                price: "$2,500",
-                duration: "4-6 weeks",
-                description: "Essential cloud infrastructure for small applications",
-                features: [
-                    { name: "Basic Cloud Setup", included: true },
-                    { name: "Simple CI/CD", included: true },
-                    { name: "Basic Monitoring", included: true },
-                    { name: "Security Basics", included: true },
-                    { name: "Backup Setup", included: true },
-                    { name: "Auto-scaling", included: false },
-                    { name: "Advanced Security", included: false },
-                    { name: "Multi-region", included: false }
-                ]
-            },
-            {
-                name: "Professional Cloud",
-                price: "$5,500",
-                duration: "6-8 weeks",
-                description: "Comprehensive cloud solution with advanced features",
-                popular: true,
-                features: [
-                    { name: "Advanced Cloud Architecture", included: true },
-                    { name: "Full CI/CD Pipeline", included: true },
-                    { name: "Comprehensive Monitoring", included: true },
-                    { name: "Enhanced Security", included: true },
-                    { name: "Automated Backups", included: true },
-                    { name: "Auto-scaling", included: true },
-                    { name: "Load Balancing", included: true },
-                    { name: "Multi-region", included: false }
-                ]
-            },
-            {
-                name: "Enterprise Cloud",
-                price: "Custom",
-                duration: "8-10 weeks",
-                description: "Enterprise-grade cloud infrastructure",
-                features: [
-                    { name: "Enterprise Architecture", included: true },
-                    { name: "Advanced CI/CD", included: true },
-                    { name: "Enterprise Monitoring", included: true },
-                    { name: "Enterprise Security", included: true },
-                    { name: "Disaster Recovery", included: true },
-                    { name: "Advanced Auto-scaling", included: true },
-                    { name: "Global Load Balancing", included: true },
-                    { name: "Multi-region Setup", included: true }
-                ]
-            }
-        ]
-    },
-
-    // Consulting & Strategy
-    {
-        id: "tech-consulting",
-        name: "Technology Consulting",
-        shortDescription: "Strategic technology guidance and architecture planning",
-        description: "Expert consultation on technology strategy, architecture decisions, and digital transformation planning.",
-        category: "Consulting & Strategy",
-        subcategory: "Strategic Planning",
-        icon: Users,
-        features: ["Technology Assessment", "Architecture Planning", "Strategy Development", "Team Training", "Process Optimization", "Risk Assessment"],
-        technologies: ["Various based on needs", "Architecture Frameworks", "Best Practices", "Industry Standards"],
-        deliverables: ["Strategy Document", "Architecture Plans", "Implementation Roadmap", "Training Materials"],
-        timeline: "2-8 weeks",
-        tiers: [
-            {
-                name: "Quick Assessment",
-                price: "$1,500",
-                duration: "2-3 weeks",
-                description: "Rapid technology and process assessment",
-                features: [
-                    { name: "Current State Analysis", included: true },
-                    { name: "Improvement Recommendations", included: true },
-                    { name: "Basic Roadmap", included: true },
-                    { name: "1 Strategy Session", included: true },
-                    { name: "Written Report", included: true },
-                    { name: "Follow-up Support", included: false },
-                    { name: "Implementation Support", included: false },
-                    { name: "Team Training", included: false }
-                ]
-            },
-            {
-                name: "Comprehensive Review",
-                price: "$4,500",
-                duration: "4-6 weeks",
-                description: "Detailed analysis with implementation planning",
-                popular: true,
-                features: [
-                    { name: "Deep Technology Audit", included: true },
-                    { name: "Detailed Recommendations", included: true },
-                    { name: "Implementation Roadmap", included: true },
-                    { name: "Multiple Strategy Sessions", included: true },
-                    { name: "Comprehensive Report", included: true },
-                    { name: "30-day Follow-up", included: true },
-                    { name: "Basic Implementation Support", included: true },
-                    { name: "Team Training", included: false }
-                ]
-            },
-            {
-                name: "Enterprise Consulting",
-                price: "Custom",
-                duration: "6-8 weeks",
-                description: "Enterprise-level strategic consulting",
-                features: [
-                    { name: "Enterprise Architecture Review", included: true },
-                    { name: "Strategic Recommendations", included: true },
-                    { name: "Detailed Implementation Plan", included: true },
-                    { name: "Ongoing Strategy Support", included: true },
-                    { name: "Executive Presentations", included: true },
-                    { name: "90-day Follow-up", included: true },
-                    { name: "Full Implementation Support", included: true },
-                    { name: "Executive & Team Training", included: true }
-                ]
-            }
-        ]
-    },
 
     // Maintenance & Support
     {
@@ -540,7 +426,7 @@ const allServices: Service[] = [
         tiers: [
             {
                 name: "Basic Support",
-                price: "$299/month",
+                price: "$20/month",
                 duration: "Monthly",
                 description: "Essential maintenance for small websites",
                 features: [
@@ -556,7 +442,7 @@ const allServices: Service[] = [
             },
             {
                 name: "Professional Support",
-                price: "$599/month",
+                price: "$50/month",
                 duration: "Monthly",
                 description: "Comprehensive support for business applications",
                 popular: true,
@@ -573,7 +459,7 @@ const allServices: Service[] = [
             },
             {
                 name: "Enterprise Support",
-                price: "$1,299/month",
+                price: "$100/month",
                 duration: "Monthly",
                 description: "Enterprise-level support with dedicated attention",
                 features: [
@@ -649,10 +535,9 @@ const categoryColors = {
     "Web Development": "#0376aa",
     "Mobile Development": "#8b5cf6",
     "Data Analytics": "#32cf37",
-    "AI & Machine Learning": "#ef4444",
-    "DevOps & Cloud": "#f59e0b",
-    "Consulting & Strategy": "#ec4899",
-    "Maintenance & Support": "#06b6d4"
+    "Design & Strategy": "#f59e0b",
+    "Design": "#f59e0b",
+    "Maintenance & Support": "#32cf37"
 }
 
 function ServiceCard({ service }: { service: Service }) {
@@ -721,14 +606,14 @@ function ServiceCard({ service }: { service: Service }) {
 
                 {/* Action Buttons */}
                 <div className="pt-4 space-y-2">
-                    <Button
+                    {/* <Button
                         size="sm"
                         className="w-full text-white transition-all duration-300 hover:opacity-90"
                         style={{ backgroundColor: categoryColor }}
                     >
                         <MessageCircle className="mr-2 h-4 w-4" />
                         Get Quote
-                    </Button>
+                    </Button> */}
                     <Button
                         size="sm"
                         variant="outline"
@@ -890,7 +775,7 @@ export default function ServicesPage() {
                     </p>
 
                     {/* Stats */}
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-2xl mx-auto">
+                    {/* <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-2xl mx-auto">
                         <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
                             <div className="text-2xl font-bold text-[#0376aa]">{serviceStats.total}+</div>
                             <div className="text-sm text-gray-600 dark:text-gray-300">Services Offered</div>
@@ -907,7 +792,7 @@ export default function ServicesPage() {
                             <div className="text-2xl font-bold text-[#f59e0b]">{serviceStats.satisfaction}</div>
                             <div className="text-sm text-gray-600 dark:text-gray-300">Satisfaction</div>
                         </div>
-                    </div>
+                    </div> */}
                 </div>
 
                 {/* Filters and Search */}

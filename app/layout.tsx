@@ -8,6 +8,7 @@ import { ThemeProvider } from "@/components/theme-provider"
 import ConditionalFooter from "@/components/conditional-footer"
 import { ClerkProvider } from '@clerk/nextjs'
 import ThemePopup from "@/components/ThemePopup"
+import { GoogleAnalytics } from "@next/third-parties/google"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -53,6 +54,7 @@ export default function RootLayout({
             richColors
             duration={3000}
           />
+          <GoogleAnalytics gaId="G-YEK40Z984P" />
         </body>
       </html>
     </ClerkProvider>

@@ -264,11 +264,11 @@ export default function Contact() {
                       className="w-full p-3 bg-gray-50 dark:bg-gray-600 border border-gray-300 dark:border-gray-500 rounded-lg text-gray-900 dark:text-white focus:ring-2 focus:ring-[#0376aa] focus:border-transparent"
                     >
                       <option value="">Select budget range</option>
+                      <option value="1k-5k">$500 - $1,000</option>
                       <option value="1k-5k">$1,000 - $5,000</option>
                       <option value="5k-15k">$5,000 - $15,000</option>
                       <option value="15k-50k">$15,000 - $50,000</option>
-                      <option value="50k-100k">$50,000 - $100,000</option>
-                      <option value="100k+">$100,000+</option>
+
                     </select>
                   </div>
 

@@ -161,6 +161,7 @@ export default function AboutPage() {
                             <div className="relative">
                                 <div className="absolute inset-0 bg-gradient-to-r from-[#0376aa] to-[#32cf37] rounded-2xl rotate-3"></div>
                                 <div className="relative bg-white dark:bg-gray-800 p-2 rounded-2xl shadow-2xl">
+                                    {/* erik-mclean-_zE8k4OKN2E-unsplash.jpg */}
                                     <Image
                                         src="/images/NEW_LOOK.jpg"
                                         alt="Professional portrait"
