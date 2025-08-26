@@ -37,7 +37,7 @@ const allProjects: Project[] = [
         id: "kumo-restaurant",
         name: "The Kumo - Japanese Restaurant",
         description: "Modern Japanese restaurant website featuring elegant design, online reservations, interactive menu, chef profiles, and customer review system with seamless user experience.",
-        technologies: ["Next.js", "React", "TypeScript", "Tailwind CSS", "Framer Motion", "Vercel"],
+        technologies: ["Next.js", "React", "TypeScript", "Tailwind CSS", "Vercel"],
         github: "#",
         demo: "https://thekumhoapp.vercel.app/",
         category: "Web Development",
@@ -54,22 +54,22 @@ const allProjects: Project[] = [
         year: 2024
     },
     {
-        id: "food-delivery-app",
-        name: "FoodieExpress - Delivery Platform",
-        description: "Full-stack food delivery application with real-time tracking, payment integration, restaurant management dashboard, and customer ordering system.",
-        technologies: ["React Native", "Node.js", "Express", "MongoDB", "Socket.io", "Stripe", "Google Maps API"],
+        id: "torontosaunaco",
+        name: "Sauna and Wellness Web App",
+        description: "Full-stack sauna and wellness application with real-time booking, payment integration, user profiles, and service management.",
+        technologies: ["Node.js", "Express", "MongoDB", "Google Tag Manager"],
         github: "#",
-        demo: "#",
-        category: "Mobile Development",
-        subcategory: "Food & Delivery",
+        demo: "https://www.thetorontosaunaco.com/",
+        category: "Web Development",
+        subcategory: "Health & Wellness",
         icon: ShoppingCart,
         metrics: {
-            orders: "500+ daily orders",
-            restaurants: "50+ partner restaurants",
-            delivery: "Average 25min delivery"
+            orders: "100+",
+            users: "50+ active users",
+            delivery: "Quick turnaround time"
         },
-        image: "/images/danny-sunderman-CfY6uhlONhw-unsplash.jpg",
-        status: "development",
+        image: "/images/TorontoSaunaCo.png",
+        status: "live",
         featured: true,
         year: 2024
     },
@@ -91,30 +91,30 @@ const allProjects: Project[] = [
             security: "Enterprise-grade security"
         },
         image: "/images/SmartClock.png",
-        status: "live",
+        status: "development",
         featured: true,
         year: 2024
     },
-    {
-        id: "project-management-tool",
-        name: "TaskMaster Pro - Project Management",
-        description: "Comprehensive project management solution with Kanban boards, Gantt charts, team collaboration, time tracking, and advanced reporting capabilities.",
-        technologies: ["Vue.js", "Laravel", "MySQL", "Redis", "WebSocket", "Docker"],
-        github: "#",
-        demo: "#",
-        category: "Web Development",
-        subcategory: "Business Tools",
-        icon: BarChart3,
-        metrics: {
-            projects: "1000+ active projects",
-            users: "5000+ registered users",
-            efficiency: "40% productivity increase"
-        },
-        image: "/images/kaleidico-3V8xo5Gbusk-unsplash.jpg",
-        status: "live",
-        featured: false,
-        year: 2023
-    },
+    // {
+    //     id: "project-management-tool",
+    //     name: "TaskMaster Pro - Project Management",
+    //     description: "Comprehensive project management solution with Kanban boards, Gantt charts, team collaboration, time tracking, and advanced reporting capabilities.",
+    //     technologies: ["Vue.js", "Laravel", "MySQL", "Redis", "WebSocket", "Docker"],
+    //     github: "#",
+    //     demo: "#",
+    //     category: "Web Development",
+    //     subcategory: "Business Tools",
+    //     icon: BarChart3,
+    //     metrics: {
+    //         projects: "1000+ active projects",
+    //         users: "5000+ registered users",
+    //         efficiency: "40% productivity increase"
+    //     },
+    //     image: "/images/kaleidico-3V8xo5Gbusk-unsplash.jpg",
+    //     status: "live",
+    //     featured: false,
+    //     year: 2023
+    // },
 
     // E-Commerce
     {
@@ -138,153 +138,153 @@ const allProjects: Project[] = [
         year: 2024
     },
     {
-        id: "fashion-marketplace",
-        name: "StyleHub - Fashion Marketplace",
-        description: "Multi-vendor fashion marketplace with vendor dashboards, inventory management, advanced search filters, and social shopping features.",
-        technologies: ["React", "Django", "PostgreSQL", "Elasticsearch", "AWS S3", "Stripe Connect"],
+        id: "movie-streaming-platform",
+        name: "CineMagic - Movie Streaming Platform",
+        description: "Subscription-based movie streaming platform with personalized recommendations, offline viewing, and multi-device support.",
+        technologies: ["JS", "HTML", "CSS", "AXIOS", "API"],
         github: "#",
-        demo: "#",
+        demo: "https://whimsical-smakager-78ff41.netlify.app/",
         category: "Web Development",
-        subcategory: "E-Commerce",
+        subcategory: "Streaming",
         icon: Users,
         metrics: {
             vendors: "200+ active vendors",
-            products: "10,000+ fashion items",
-            revenue: "$500K+ monthly GMV"
+            products: "10,000+ movie and tv shows",
+
         },
-        image: "/images/mariola-grobelska-6yfbWUDHHOE-unsplash.jpg",
+        image: "/images/Movie_App.png",
         status: "live",
         featured: false,
         year: 2023
     },
 
     // Data Analytics
-    {
-        id: "predictive-sales-analytics",
-        name: "Predictive Sales Analytics Platform",
-        description: "Machine learning-powered sales forecasting system with interactive dashboards, providing 90% accuracy in quarterly predictions.",
-        technologies: ["Python", "TensorFlow", "Pandas", "Plotly", "PostgreSQL", "Docker", "Airflow"],
-        github: "#",
-        demo: "#",
-        category: "Data Analytics",
-        subcategory: "Predictive Analytics",
-        icon: TrendingUp,
-        metrics: {
-            accuracy: "90% prediction accuracy",
-            revenue: "$2M+ revenue impact",
-            efficiency: "75% faster forecasting"
-        },
-        image: "/images/maxim-tolchinskiy-NBhIaEGgK48-unsplash.jpg",
-        status: "live",
-        featured: true,
-        year: 2024
-    },
-    {
-        id: "customer-intelligence",
-        name: "Customer Intelligence Dashboard",
-        description: "Advanced customer segmentation and behavior analysis platform with real-time insights and automated marketing recommendations.",
-        technologies: ["Python", "Scikit-learn", "Tableau", "Apache Spark", "AWS", "Snowflake"],
-        github: "#",
-        demo: "#",
-        category: "Data Analytics",
-        subcategory: "Business Intelligence",
-        icon: BarChart3,
-        metrics: {
-            segments: "15+ customer segments",
-            engagement: "35% increase in engagement",
-            retention: "20% improvement in retention"
-        },
-        image: "/images/carlos-muza-hpjSkU2UYSU-unsplash.jpg",
-        status: "live",
-        featured: true,
-        year: 2024
-    },
-    {
-        id: "financial-risk-assessment",
-        name: "Financial Risk Assessment Engine",
-        description: "AI-powered risk assessment system for loan approvals with ensemble learning models and real-time decision making capabilities.",
-        technologies: ["Python", "XGBoost", "Apache Kafka", "PostgreSQL", "Docker", "Kubernetes"],
-        github: "#",
-        demo: "#",
-        category: "Data Analytics",
-        subcategory: "Financial Analytics",
-        icon: Database,
-        metrics: {
-            accuracy: "95% risk prediction accuracy",
-            speed: "Sub-second decisions",
-            reduction: "40% default rate reduction"
-        },
-        image: "/images/kaleidico-3V8xo5Gbusk-unsplash.jpg",
-        status: "live",
-        featured: true,
-        year: 2024
-    },
+    // {
+    //     id: "predictive-sales-analytics",
+    //     name: "Predictive Sales Analytics Platform",
+    //     description: "Machine learning-powered sales forecasting system with interactive dashboards, providing 90% accuracy in quarterly predictions.",
+    //     technologies: ["Python", "TensorFlow", "Pandas", "Plotly", "PostgreSQL", "Docker", "Airflow"],
+    //     github: "#",
+    //     demo: "#",
+    //     category: "Data Analytics",
+    //     subcategory: "Predictive Analytics",
+    //     icon: TrendingUp,
+    //     metrics: {
+    //         accuracy: "90% prediction accuracy",
+    //         revenue: "$2M+ revenue impact",
+    //         efficiency: "75% faster forecasting"
+    //     },
+    //     image: "/images/maxim-tolchinskiy-NBhIaEGgK48-unsplash.jpg",
+    //     status: "live",
+    //     featured: true,
+    //     year: 2024
+    // },
+    // {
+    //     id: "customer-intelligence",
+    //     name: "Customer Intelligence Dashboard",
+    //     description: "Advanced customer segmentation and behavior analysis platform with real-time insights and automated marketing recommendations.",
+    //     technologies: ["Python", "Scikit-learn", "Tableau", "Apache Spark", "AWS", "Snowflake"],
+    //     github: "#",
+    //     demo: "#",
+    //     category: "Data Analytics",
+    //     subcategory: "Business Intelligence",
+    //     icon: BarChart3,
+    //     metrics: {
+    //         segments: "15+ customer segments",
+    //         engagement: "35% increase in engagement",
+    //         retention: "20% improvement in retention"
+    //     },
+    //     image: "/images/carlos-muza-hpjSkU2UYSU-unsplash.jpg",
+    //     status: "live",
+    //     featured: true,
+    //     year: 2024
+    // },
+    // {
+    //     id: "financial-risk-assessment",
+    //     name: "Financial Risk Assessment Engine",
+    //     description: "AI-powered risk assessment system for loan approvals with ensemble learning models and real-time decision making capabilities.",
+    //     technologies: ["Python", "XGBoost", "Apache Kafka", "PostgreSQL", "Docker", "Kubernetes"],
+    //     github: "#",
+    //     demo: "#",
+    //     category: "Data Analytics",
+    //     subcategory: "Financial Analytics",
+    //     icon: Database,
+    //     metrics: {
+    //         accuracy: "95% risk prediction accuracy",
+    //         speed: "Sub-second decisions",
+    //         reduction: "40% default rate reduction"
+    //     },
+    //     image: "/images/kaleidico-3V8xo5Gbusk-unsplash.jpg",
+    //     status: "live",
+    //     featured: true,
+    //     year: 2024
+    // },
 
     // API & Backend
-    {
-        id: "api-gateway-platform",
-        name: "CloudAPI - Gateway Platform",
-        description: "Scalable API gateway with authentication, rate limiting, analytics, and microservices orchestration for enterprise applications.",
-        technologies: ["Node.js", "GraphQL", "Redis", "Docker", "Kubernetes", "JWT", "OpenAPI"],
-        github: "#",
-        demo: "#",
-        category: "Backend Development",
-        subcategory: "API Services",
-        icon: Database,
-        metrics: {
-            requests: "1M+ requests/day",
-            uptime: "99.9% availability",
-            latency: "< 50ms response time"
-        },
-        image: "/images/pawel-czerwinski-Eru5-VMQZT8-unsplash.jpg",
-        status: "live",
-        featured: false,
-        year: 2023
-    },
+    // {
+    //     id: "api-gateway-platform",
+    //     name: "CloudAPI - Gateway Platform",
+    //     description: "Scalable API gateway with authentication, rate limiting, analytics, and microservices orchestration for enterprise applications.",
+    //     technologies: ["Node.js", "GraphQL", "Redis", "Docker", "Kubernetes", "JWT", "OpenAPI"],
+    //     github: "#",
+    //     demo: "#",
+    //     category: "Backend Development",
+    //     subcategory: "API Services",
+    //     icon: Database,
+    //     metrics: {
+    //         requests: "1M+ requests/day",
+    //         uptime: "99.9% availability",
+    //         latency: "< 50ms response time"
+    //     },
+    //     image: "/images/pawel-czerwinski-Eru5-VMQZT8-unsplash.jpg",
+    //     status: "live",
+    //     featured: false,
+    //     year: 2023
+    // },
 
     // AI & Machine Learning
-    {
-        id: "chatbot-platform",
-        name: "IntelliChat - AI Customer Service",
-        description: "Advanced conversational AI platform with natural language processing, multi-language support, and seamless human handoff capabilities.",
-        technologies: ["Python", "OpenAI GPT", "FastAPI", "WebSocket", "React", "Redis", "PostgreSQL"],
-        github: "#",
-        demo: "#",
-        category: "AI & Machine Learning",
-        subcategory: "Conversational AI",
-        icon: Brain,
-        metrics: {
-            accuracy: "95% intent recognition",
-            languages: "12 languages supported",
-            resolution: "80% automated resolution"
-        },
-        image: "/images/milad-fakurian-h2OGkmktW5k-unsplash.jpg",
-        status: "development",
-        featured: true,
-        year: 2024
-    },
+    // {
+    //     id: "chatbot-platform",
+    //     name: "IntelliChat - AI Customer Service",
+    //     description: "Advanced conversational AI platform with natural language processing, multi-language support, and seamless human handoff capabilities.",
+    //     technologies: ["Python", "OpenAI GPT", "FastAPI", "WebSocket", "React", "Redis", "PostgreSQL"],
+    //     github: "#",
+    //     demo: "#",
+    //     category: "AI & Machine Learning",
+    //     subcategory: "Conversational AI",
+    //     icon: Brain,
+    //     metrics: {
+    //         accuracy: "95% intent recognition",
+    //         languages: "12 languages supported",
+    //         resolution: "80% automated resolution"
+    //     },
+    //     image: "/images/milad-fakurian-h2OGkmktW5k-unsplash.jpg",
+    //     status: "development",
+    //     featured: true,
+    //     year: 2024
+    // },
 
     // Mobile Apps
-    {
-        id: "fitness-tracker-app",
-        name: "FitTrack - Personal Fitness",
-        description: "Comprehensive fitness tracking mobile app with workout plans, nutrition tracking, progress analytics, and social features.",
-        technologies: ["React Native", "Firebase", "Redux", "Chart.js", "Health Kit", "Google Fit"],
-        github: "#",
-        demo: "#",
-        category: "Mobile Development",
-        subcategory: "Health & Fitness",
-        icon: Smartphone,
-        metrics: {
-            users: "10,000+ active users",
-            workouts: "50,000+ completed workouts",
-            retention: "70% monthly retention"
-        },
-        image: "/images/andrei-castanha-TDXqGd7JI2o-unsplash (1).jpg",
-        status: "live",
-        featured: false,
-        year: 2023
-    }
+    // {
+    //     id: "fitness-tracker-app",
+    //     name: "FitTrack - Personal Fitness",
+    //     description: "Comprehensive fitness tracking mobile app with workout plans, nutrition tracking, progress analytics, and social features.",
+    //     technologies: ["React Native", "Firebase", "Redux", "Chart.js", "Health Kit", "Google Fit"],
+    //     github: "#",
+    //     demo: "#",
+    //     category: "Mobile Development",
+    //     subcategory: "Health & Fitness",
+    //     icon: Smartphone,
+    //     metrics: {
+    //         users: "10,000+ active users",
+    //         workouts: "50,000+ completed workouts",
+    //         retention: "70% monthly retention"
+    //     },
+    //     image: "/images/andrei-castanha-TDXqGd7JI2o-unsplash (1).jpg",
+    //     status: "live",
+    //     featured: false,
+    //     year: 2023
+    // }
 ]
 
 const categoryColors = {

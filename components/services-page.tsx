@@ -477,32 +477,32 @@ const allServices: Service[] = [
     }
 ]
 
-const testimonials = [
-    {
-        name: "Sarah Johnson",
-        company: "TechStart Inc.",
-        role: "CEO",
-        content: "The custom web application exceeded our expectations. The team delivered on time and the solution has significantly improved our business operations.",
-        rating: 5,
-        service: "Custom Web Applications"
-    },
-    {
-        name: "Michael Chen",
-        company: "DataFlow Analytics",
-        role: "CTO",
-        content: "Outstanding data analytics dashboard. The insights we're getting are invaluable for our decision-making process. Highly recommend their services.",
-        rating: 5,
-        service: "Business Intelligence"
-    },
-    {
-        name: "Emily Rodriguez",
-        company: "GreenLeaf Retail",
-        role: "Operations Manager",
-        content: "Our e-commerce platform has transformed our business. Sales have increased by 40% since launch. Professional and responsive team.",
-        rating: 5,
-        service: "E-Commerce Solutions"
-    }
-]
+// const testimonials = [
+//     {
+//         name: "Sarah Johnson",
+//         company: "TechStart Inc.",
+//         role: "CEO",
+//         content: "The custom web application exceeded our expectations. The team delivered on time and the solution has significantly improved our business operations.",
+//         rating: 5,
+//         service: "Custom Web Applications"
+//     },
+//     {
+//         name: "Michael Chen",
+//         company: "DataFlow Analytics",
+//         role: "CTO",
+//         content: "Outstanding data analytics dashboard. The insights we're getting are invaluable for our decision-making process. Highly recommend their services.",
+//         rating: 5,
+//         service: "Business Intelligence"
+//     },
+//     {
+//         name: "Emily Rodriguez",
+//         company: "GreenLeaf Retail",
+//         role: "Operations Manager",
+//         content: "Our e-commerce platform has transformed our business. Sales have increased by 40% since launch. Professional and responsive team.",
+//         rating: 5,
+//         service: "E-Commerce Solutions"
+//     }
+// ]
 
 const faqs = [
     {
@@ -606,21 +606,23 @@ function ServiceCard({ service }: { service: Service }) {
 
                 {/* Action Buttons */}
                 <div className="pt-4 space-y-2">
+                    <Link href="/contact">
+                        <Button
+                            size="sm"
+                            className="w-full text-white transition-all duration-300 hover:opacity-90"
+                            style={{ backgroundColor: categoryColor }}
+                        >
+                            <MessageCircle className="mr-2 h-4 w-4" />
+                            Get Quote
+                        </Button>
+                    </Link>
                     {/* <Button
-                        size="sm"
-                        className="w-full text-white transition-all duration-300 hover:opacity-90"
-                        style={{ backgroundColor: categoryColor }}
-                    >
-                        <MessageCircle className="mr-2 h-4 w-4" />
-                        Get Quote
-                    </Button> */}
-                    <Button
                         size="sm"
                         variant="outline"
                         className="w-full"
                     >
                         View Details
-                    </Button>
+                    </Button> */}
                 </div>
             </CardContent>
         </Card>
@@ -847,7 +849,7 @@ export default function ServicesPage() {
                     <TabsList className="grid w-full grid-cols-4 max-w-2xl mx-auto mb-8">
                         <TabsTrigger value="overview">Services</TabsTrigger>
                         <TabsTrigger value="process">Process</TabsTrigger>
-                        <TabsTrigger value="testimonials">Reviews</TabsTrigger>
+                        {/* <TabsTrigger value="testimonials">Reviews</TabsTrigger> */}
                         <TabsTrigger value="faq">FAQ</TabsTrigger>
                     </TabsList>
 
@@ -953,7 +955,7 @@ export default function ServicesPage() {
                         </div>
                     </TabsContent>
 
-                    <TabsContent value="testimonials" className="space-y-8">
+                    {/* <TabsContent value="testimonials" className="space-y-8">
                         <div className="text-center mb-12">
                             <h3 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Client Testimonials</h3>
                             <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
@@ -986,7 +988,7 @@ export default function ServicesPage() {
                                 </Card>
                             ))}
                         </div>
-                    </TabsContent>
+                    </TabsContent> */}
 
                     <TabsContent value="faq" className="space-y-8">
                         <div className="text-center mb-12">
@@ -1024,7 +1026,7 @@ export default function ServicesPage() {
                 </Tabs>
 
                 {/* Bottom CTA */}
-                <div className="mt-16 text-center">
+                {/* <div className="mt-16 text-center">
                     <Card className="bg-gradient-to-r from-[#0376aa] to-[#32cf37] text-white p-8">
                         <CardContent className="space-y-4">
                             <h3 className="text-2xl md:text-3xl font-bold">Ready to Get Started?</h3>
@@ -1055,7 +1057,7 @@ export default function ServicesPage() {
                             </div>
                         </CardContent>
                     </Card>
-                </div>
+                </div> */}
             </div>
         </section>
     )

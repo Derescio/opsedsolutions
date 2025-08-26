@@ -1,6 +1,7 @@
 'use client'
 import { Card, CardContent } from "@/components/ui/card"
 import { Code, Database, TrendingUp, Users, Award, Coffee } from "lucide-react"
+import Link from "next/link"
 
 const skills = [
   { name: "Full-Stack Development", category: "Development", icon: Code, color: "#0376aa" },
@@ -14,22 +15,21 @@ const skills = [
 const technologies = [
   { name: "React/Next.js", category: "Frontend" },
   { name: "TypeScript", category: "Language" },
-  { name: "Node.js", category: "Backend" },
+  { name: "Node.js/Next.js", category: "Backend" },
   { name: "Python", category: "Language" },
   { name: "PostgreSQL", category: "Database" },
   { name: "MongoDB", category: "Database" },
-  { name: "AWS/Azure", category: "Cloud" },
   { name: "Docker", category: "DevOps" },
   { name: "Pandas/NumPy", category: "Data Science" },
-  { name: "TensorFlow", category: "ML/AI" },
-  { name: "Tableau", category: "Visualization" },
-  { name: "Apache Spark", category: "Big Data" },
+  { name: "JavaScript", category: "Language" },
+  { name: "Tableau/Power BI", category: "Visualization" },
+  { name: "Big Query", category: "Big Data" },
 ]
 
 const achievements = [
   { metric: "5+", label: "Years Experience" },
   { metric: "50+", label: "Projects Completed" },
-  { metric: "15+", label: "Enterprise Clients" },
+  { metric: "5+", label: "Enterprise Clients" },
   { metric: "99.9%", label: "Client Satisfaction" },
 ]
 
@@ -162,12 +162,14 @@ export default function About() {
                 >
                   Let&apos;s Connect
                 </button>
-                <button
-                  className="border border-white text-white hover:bg-white hover:text-[#0376aa] px-8 py-3 rounded-lg font-medium transition-colors"
-                  onClick={() => document.getElementById("projects")?.scrollIntoView({ behavior: "smooth" })}
-                >
-                  View My Work
-                </button>
+                <Link href="/projects">
+                  <button
+                    className="border border-white text-white hover:bg-white hover:text-[#0376aa] px-8 py-3 rounded-lg font-medium transition-colors"
+                  // onClick={() => document.getElementById("projects")?.scrollIntoView({ behavior: "smooth" })}
+                  >
+                    View My Work
+                  </button>
+                </Link>
               </div>
             </CardContent>
           </Card>

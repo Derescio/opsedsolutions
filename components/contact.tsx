@@ -7,6 +7,7 @@ import { Mail, MapPin, Clock, Send, MessageSquare, Calendar } from "lucide-react
 import { sendEmail } from "@/lib/actions/email-sender"
 import { useState } from "react"
 import { toast } from "sonner"
+import Link from "next/link"
 
 const contactInfo = [
   {
@@ -329,19 +330,23 @@ export default function Contact() {
               I&apos;m here to help you achieve your business goals through technology and data.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button
-                className="bg-[#0376aa] hover:bg-[#025a8a] text-white px-8 py-3 rounded-lg transition-colors"
-                onClick={() => document.getElementById("services")?.scrollIntoView({ behavior: "smooth" })}
-              >
-                View Services
-              </Button>
-              <Button
-                variant="outline"
-                className="border-[#32cf37] text-[#32cf37] hover:bg-[#32cf37] hover:text-white px-8 py-3 rounded-lg transition-colors"
-                onClick={() => document.getElementById("projects")?.scrollIntoView({ behavior: "smooth" })}
-              >
-                See Portfolio
-              </Button>
+              <Link href="/services">
+                <Button
+                  className="bg-[#0376aa] hover:bg-[#025a8a] text-white px-8 py-3 rounded-lg transition-colors"
+                //onClick={() => document.getElementById("services")?.scrollIntoView({ behavior: "smooth" })}
+                >
+                  View Services
+                </Button>
+              </Link>
+
+              <Link href="/projects">
+                <Button
+                  variant="outline"
+                  className="border-[#32cf37] text-[#32cf37] hover:bg-[#32cf37] hover:text-white px-8 py-3 rounded-lg transition-colors"
+                >
+                  See Portfolio
+                </Button>
+              </Link>
             </div>
           </div>
         </div>

@@ -103,20 +103,27 @@ const skills = [
         description: "Connecting data to business outcomes"
     }
 ]
+// const skills = [
+//   { name: "Full-Stack Development", category: "Development", icon: Code, color: "#0376aa" },
+//   { name: "Data Analytics", category: "Analytics", icon: Database, color: "#32cf37" },
+//   { name: "Machine Learning", category: "AI/ML", icon: TrendingUp, color: "#0376aa" },
+//   { name: "Team Leadership", category: "Management", icon: Users, color: "#32cf37" },
+//   { name: "System Architecture", category: "Design", icon: Award, color: "#0376aa" },
+//   { name: "Business Intelligence", category: "Strategy", icon: Coffee, color: "#32cf37" },
+// ]
 
 const technologies = [
-    { name: "React", category: "Frontend", level: "Expert" },
-    { name: "Next.js", category: "Framework", level: "Expert" },
-    { name: "TypeScript", category: "Language", level: "Advanced" },
-    { name: "Node.js", category: "Backend", level: "Advanced" },
-    { name: "Python", category: "Language", level: "Advanced" },
-    { name: "PostgreSQL", category: "Database", level: "Advanced" },
-    { name: "MongoDB", category: "Database", level: "Intermediate" },
-    { name: "Pandas", category: "Data Science", level: "Advanced" },
-    { name: "Tableau", category: "Visualization", level: "Advanced" },
-    { name: "AWS", category: "Cloud", level: "Intermediate" },
-    { name: "Docker", category: "DevOps", level: "Intermediate" },
-    { name: "TensorFlow", category: "ML/AI", level: "Intermediate" }
+    { name: "React/Next.js", level: "Frontend" },
+    { name: "TypeScript", level: "Language" },
+    { name: "Node.js/Next.js", level: "Backend" },
+    { name: "Python", level: "Language" },
+    { name: "PostgreSQL", level: "Database" },
+    { name: "MongoDB", level: "Database" },
+    { name: "Docker", level: "DevOps" },
+    { name: "Pandas/NumPy", level: "Data Science" },
+    { name: "JavaScript", level: "Language" },
+    { name: "Tableau/Power BI", level: "Visualization" },
+    { name: "Big Query", level: "Big Data" },
 ]
 
 const achievements = [
@@ -218,6 +225,18 @@ export default function AboutPage() {
                                         View My Work
                                     </Button>
                                 </Link>
+                                <a
+                                    href="/Damion_Wilson_Updated_CV.pdf"
+                                    download
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-block"
+                                >
+                                    <Button size="lg" variant="outline" className="border-[#8b5cf6] text-[#8b5cf6] hover:bg-[#8b5cf6] hover:text-white px-8">
+                                        <ArrowRight className="mr-2 h-5 w-5" />
+                                        Download CV
+                                    </Button>
+                                </a>
                             </div>
                         </div>
                     </div>
