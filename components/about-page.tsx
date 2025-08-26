@@ -226,7 +226,8 @@ export default function AboutPage() {
                                     </Button>
                                 </Link>
                                 <a
-                                    href="/Damion_Wilson_Updated_CV.pdf"
+
+                                    href="/Damion_Wilson_CV.pdf"
                                     download
                                     target="_blank"
                                     rel="noopener noreferrer"
