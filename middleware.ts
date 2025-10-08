@@ -4,6 +4,7 @@ import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
 const isProtectedRoute = createRouteMatcher([
   '/dashboard(.*)',
   '/admin(.*)',
+  '/studio(.*)', // Protect Sanity Studio
   '/tickets(.*)',
   '/profile(.*)',
   '/api/tickets(.*)',
