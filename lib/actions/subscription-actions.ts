@@ -1,12 +1,10 @@
 'use server'
 
 import { getCurrentUser } from '@/lib/auth'
-import { PrismaClient } from '@/lib/generated/prisma'
+import { db } from '@/lib/db'
 import { stripe } from '@/lib/stripe'
 import { HOSTING_PLANS, type HostingPlan } from '@/lib/constants/hosting-plans'
 import { getPaymentSuccessUrl, getPaymentCancelUrl } from '@/lib/url-helper'
-
-const prisma = new PrismaClient()
 
 // Create hosting subscription after project completion
 export async function createHostingSubscription(projectId: string, hostingPlanId: string) {
@@ -17,7 +15,7 @@ export async function createHostingSubscription(projectId: string, hostingPlanId
     }
 
     // Get the project to verify it's completed
-    const project = await prisma.project.findUnique({
+    const project = await db.project.findUnique({
       where: { id: projectId }
     })
 
@@ -50,7 +48,7 @@ export async function createHostingSubscription(projectId: string, hostingPlanId
       customerId = customer.id
       
       // Update user with customer ID
-      await prisma.user.update({
+      await db.user.update({
         where: { id: user.id },
         data: { stripeCustomerId: customerId }
       })
@@ -124,7 +122,7 @@ export async function getUserHostingSubscriptions() {
       throw new Error('Authentication required')
     }
 
-    const subscriptions = await prisma.subscription.findMany({
+    const subscriptions = await db.subscription.findMany({
       where: { 
         userId: user.id
       },
@@ -147,7 +145,7 @@ export async function cancelHostingSubscription(subscriptionId: string, immediat
     }
 
     // Get subscription from database
-    const subscription = await prisma.subscription.findUnique({
+    const subscription = await db.subscription.findUnique({
       where: { id: subscriptionId }
     })
 
@@ -165,7 +163,7 @@ export async function cancelHostingSubscription(subscriptionId: string, immediat
     }
 
     // Update in database
-    await prisma.subscription.update({
+    await db.subscription.update({
       where: { id: subscriptionId },
       data: {
         cancelAtPeriodEnd: !immediate,
@@ -195,7 +193,7 @@ export async function updateHostingPlan(subscriptionId: string, newHostingPlanId
     }
 
     // Get subscription from database
-    const subscription = await prisma.subscription.findUnique({
+    const subscription = await db.subscription.findUnique({
       where: { id: subscriptionId }
     })
 
@@ -235,7 +233,7 @@ export async function updateHostingPlan(subscriptionId: string, newHostingPlanId
     })
 
     // Update database
-    await prisma.subscription.update({
+    await db.subscription.update({
       where: { id: subscriptionId },
       data: {
         stripePriceId: stripePrice.id
@@ -261,7 +259,7 @@ export async function getEligibleProjectsForHosting() {
     }
 
     // Get all completed projects for the user that don't already have hosting
-    const projects = await prisma.project.findMany({
+    const projects = await db.project.findMany({
       where: {
         userId: user.id,
         status: 'COMPLETED'
@@ -279,7 +277,7 @@ export async function getEligibleProjectsForHosting() {
     const eligibleProjects = []
     
     for (const project of projects) {
-      const existingSubscription = await prisma.projectSubscription.findFirst({
+      const existingSubscription = await db.projectSubscription.findFirst({
         where: {
           projectId: project.id,
           status: { in: ['ACTIVE', 'TRIALING', 'PAST_DUE'] }
@@ -312,7 +310,7 @@ export async function checkProjectHostingEligibility(projectId: string) {
       throw new Error('Authentication required')
     }
 
-    const project = await prisma.project.findUnique({
+    const project = await db.project.findUnique({
       where: { id: projectId }
     })
 
@@ -325,7 +323,7 @@ export async function checkProjectHostingEligibility(projectId: string) {
     }
 
     // Check if already has hosting subscription
-    const existingSubscription = await prisma.subscription.findFirst({
+    const existingSubscription = await db.subscription.findFirst({
       where: {
         userId: user.id,
         status: { in: ['ACTIVE', 'TRIALING', 'PAST_DUE'] }

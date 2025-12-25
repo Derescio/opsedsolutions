@@ -6,59 +6,32 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
-// import { Progress } from '@/components/ui/progress'
 import { Separator } from '@/components/ui/separator'
 import {
     Check,
-
     ChevronRight,
-    ArrowLeft,
     Star,
     Globe,
-
     Search,
-
     TrendingUp,
-
     Building,
-
     User
 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
+import type { Service, ServiceAddOn, ServiceCategory, ServicesByCategory } from '@/lib/queries/services'
 
 // TypeScript interfaces for quote and breakdown structures
-interface Service {
-    id: string
-    name: string
-    description: string
-    basePrice: number
-    category?: {
-        id: string
-        name: string
-        icon?: string
-    }
-}
-
-interface AddOn {
-    id: string
-    name: string
-    description: string
-    priceType: 'FIXED' | 'PERCENTAGE'
-    price?: number
-    percentage?: number
-}
-
 interface SelectedService {
     service: Service
-    addOns: AddOn[]
+    addOns: ServiceAddOn[]
 }
 
 interface ServiceBreakdown {
     service: Service
     price: number
     addOns: Array<{
-        addOn: AddOn
+        addOn: ServiceAddOn
         price: number
     }>
 }
@@ -81,73 +54,16 @@ interface ContactInfo {
     requirements: string
 }
 
-const PRESET_PACKAGES = [
-    {
-        id: 'starter',
-        name: 'Starter Package',
-        description: 'Perfect for small businesses and personal websites',
-        price: { oneTime: 1500, recurring: 20 },
-        services: ['Small Website'],
-        addOns: [],
-        features: [
-            'Responsive Website Design',
-            'Basic SEO Setup',
-            '5 Pages Maximum',
-            '1 Month Support',
-            'Basic Hosting Included',
-            'Contact Forms'
-        ],
-        popular: false,
-        gradient: 'from-blue-500 to-cyan-500'
-    },
-    {
-        id: 'professional',
-        name: 'Professional Package',
-        description: 'Ideal for growing businesses with advanced needs',
-        price: { oneTime: 2800, recurring: 45 },
-        services: ['Medium Website'],
-        addOns: [],
-        features: [
-            'Advanced Website Design',
-            'Complete SEO Optimization',
-            '10 Pages Maximum',
-            '3 Months Support',
-            'Professional Hosting',
-            'E-commerce Ready',
-            'Analytics Integration',
-            'Social Media Integration'
-        ],
-        popular: true,
-        gradient: 'from-purple-500 to-pink-500'
-    },
-    {
-        id: 'enterprise',
-        name: 'Enterprise Package',
-        description: 'Complete solution for large organizations',
-        price: { oneTime: 12500, recurring: 150 },
-        services: ['Enterprise Website'],
-        addOns: [],
-        features: [
-            'Custom Enterprise Solution',
-            'Advanced SEO & Marketing',
-            'Unlimited Pages',
-            '12 Months Premium Support',
-            'Enterprise Hosting',
-            'Custom Integrations',
-            'Advanced Analytics',
-            'Priority Support',
-            'Custom Features'
-        ],
-        popular: false,
-        gradient: 'from-amber-500 to-orange-500'
-    }
-]
+interface ServiceSelectorProps {
+    services: Service[]
+    servicesByCategory: Record<string, ServicesByCategory>
+    categories: ServiceCategory[]
+}
 
-export default function ServiceSelector() {
+export default function ServiceSelector({ services, servicesByCategory, categories }: ServiceSelectorProps) {
     const [selectedServices, setSelectedServices] = useState<SelectedService[]>([])
-    const [availableServices, setAvailableServices] = useState<Service[]>([])
-    const [availableAddOns, setAvailableAddOns] = useState<AddOn[]>([])
     const [currentStep, setCurrentStep] = useState(1)
+    const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
     const [contactInfo, setContactInfo] = useState<ContactInfo>({
         name: '',
         email: '',
@@ -156,42 +72,12 @@ export default function ServiceSelector() {
         requirements: ''
     })
     const [quote, setQuote] = useState<Quote | null>(null)
-    const [loading, setLoading] = useState(false)
     const [submitting, setSubmitting] = useState(false)
     const router = useRouter()
 
     useEffect(() => {
-        fetchServices()
-    }, [])
-
-    useEffect(() => {
         calculateQuote()
     }, [selectedServices])
-
-    const fetchServices = async () => {
-        try {
-            setLoading(true)
-            const response = await fetch('/api/services')
-
-            if (!response.ok) {
-                throw new Error('Failed to fetch services')
-            }
-
-            const data = await response.json()
-
-            if (data.success) {
-                setAvailableServices(data.services || [])
-                setAvailableAddOns(data.addOns || [])
-            } else {
-                throw new Error(data.error || 'Failed to fetch services')
-            }
-        } catch (error) {
-            console.error('Error fetching services:', error)
-            toast.error('Failed to load services. Please refresh the page.')
-        } finally {
-            setLoading(false)
-        }
-    }
 
     const calculateQuote = () => {
         if (selectedServices.length === 0) {
@@ -200,7 +86,7 @@ export default function ServiceSelector() {
         }
 
         let oneTimeTotal = 0
-        const recurringTotal = 0
+        let recurringTotal = 0
         const breakdown: QuoteBreakdown = { services: [] }
 
         selectedServices.forEach(({ service, addOns }) => {
@@ -220,6 +106,27 @@ export default function ServiceSelector() {
                 }
             })
 
+            // Calculate totals based on service and add-on types
+            if (service.priceType === 'RECURRING' && service.billingInterval) {
+                // Recurring service - base price goes to recurring
+                recurringTotal += servicePrice
+            } else {
+                // One-time or custom service - base price goes to one-time
+                oneTimeTotal += servicePrice
+            }
+
+            // Process add-ons - categorize by billing interval
+            serviceAddOns.forEach(({ addOn, price }) => {
+                if (addOn.billingInterval) {
+                    // Recurring add-on
+                    recurringTotal += price
+                } else {
+                    // One-time add-on
+                    oneTimeTotal += price
+                }
+            })
+
+            // Total price for display (includes both one-time and recurring components)
             const totalServicePrice = servicePrice + serviceAddOns.reduce((sum, { price }) => sum + price, 0)
 
             breakdown.services.push({
@@ -227,8 +134,6 @@ export default function ServiceSelector() {
                 price: totalServicePrice,
                 addOns: serviceAddOns
             })
-
-            oneTimeTotal += totalServicePrice
         })
 
         setQuote({
@@ -238,26 +143,42 @@ export default function ServiceSelector() {
         })
     }
 
-    const selectPackage = (packageId: string) => {
-        const pkg = PRESET_PACKAGES.find(p => p.id === packageId)
-        if (!pkg) return
+    const selectService = (service: Service) => {
+        // Check if service is already selected
+        const existingIndex = selectedServices.findIndex(s => s.service.id === service.id)
 
-        const packageServices: SelectedService[] = []
+        if (existingIndex >= 0) {
+            // Remove if already selected
+            setSelectedServices(selectedServices.filter((_, index) => index !== existingIndex))
+        } else {
+            // Add new service with no add-ons initially
+            setSelectedServices([...selectedServices, {
+                service,
+                addOns: []
+            }])
+        }
+    }
 
-        // Add main services
-        pkg.services.forEach(serviceName => {
-            const service = availableServices.find(s => s.name === serviceName)
-            if (service) {
-                // Don't auto-add add-ons, let user choose
-                packageServices.push({
-                    service,
-                    addOns: [] // Start with no add-ons selected
-                })
+    const toggleAddOn = (serviceId: string, addOn: ServiceAddOn) => {
+        setSelectedServices(selectedServices.map(selected => {
+            if (selected.service.id === serviceId) {
+                const addOnIndex = selected.addOns.findIndex(a => a.id === addOn.id)
+                if (addOnIndex >= 0) {
+                    // Remove add-on
+                    return {
+                        ...selected,
+                        addOns: selected.addOns.filter((_, index) => index !== addOnIndex)
+                    }
+                } else {
+                    // Add add-on
+                    return {
+                        ...selected,
+                        addOns: [...selected.addOns, addOn]
+                    }
+                }
             }
-        })
-
-        setSelectedServices(packageServices)
-        setCurrentStep(2) // Move to contact info step
+            return selected
+        }))
     }
 
     const formatPrice = (price: number) => {
@@ -274,14 +195,11 @@ export default function ServiceSelector() {
             return
         }
 
-        // Prevent double submission
         if (submitting) return
 
         setSubmitting(true)
 
         try {
-            console.log('Submitting quote with data:', { quote, contactInfo, selectedServices })
-
             const response = await fetch('/api/quotes', {
                 method: 'POST',
                 headers: {
@@ -295,7 +213,6 @@ export default function ServiceSelector() {
             })
 
             const data = await response.json()
-            console.log('API Response:', data)
 
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}: ${data.error || 'Request failed'}`)
@@ -308,7 +225,6 @@ export default function ServiceSelector() {
                 throw new Error(data.error || 'Failed to submit quote request')
             }
         } catch (error) {
-            console.error('Error submitting quote:', error)
             const errorMessage = error instanceof Error ? error.message : 'Failed to submit quote request'
             toast.error(errorMessage)
         } finally {
@@ -319,21 +235,21 @@ export default function ServiceSelector() {
     const getCategoryIcon = (categoryName: string) => {
         if (categoryName.toLowerCase().includes('website')) return <Globe className="w-5 h-5" />
         if (categoryName.toLowerCase().includes('hosting')) return <Building className="w-5 h-5" />
-        if (categoryName.toLowerCase().includes('analytics')) return <TrendingUp className="w-5 h-5" />
+        if (categoryName.toLowerCase().includes('analytics') || categoryName.toLowerCase().includes('data')) return <TrendingUp className="w-5 h-5" />
         return <Search className="w-5 h-5" />
     }
 
-    if (loading) {
-        return (
-            <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-                <div className="max-w-6xl mx-auto px-4 py-8">
-                    <div className="text-center">
-                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                        <p className="text-gray-600">Loading services...</p>
-                    </div>
-                </div>
-            </div>
-        )
+    const isServiceSelected = (serviceId: string) => {
+        return selectedServices.some(s => s.service.id === serviceId)
+    }
+
+    const isAddOnSelected = (serviceId: string, addOnId: string) => {
+        const selected = selectedServices.find(s => s.service.id === serviceId)
+        return selected?.addOns.some(a => a.id === addOnId) || false
+    }
+
+    const getSelectedService = (serviceId: string) => {
+        return selectedServices.find(s => s.service.id === serviceId)
     }
 
     return (
@@ -342,10 +258,10 @@ export default function ServiceSelector() {
                 {/* Header */}
                 <div className="text-center mb-8">
                     <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
-                        Choose Your Perfect Package
+                        Choose Your Services
                     </h1>
                     <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-                        Select a pre-built package or customize your own solution. Get a detailed quote and start your project today.
+                        Select from our available services and customize with add-ons. Get a detailed quote and start your project today.
                     </p>
                 </div>
 
@@ -353,24 +269,21 @@ export default function ServiceSelector() {
                 <div className="flex justify-center mb-8">
                     <div className="flex items-center space-x-4">
                         <div className={`flex items-center ${currentStep === 1 ? 'text-blue-600' : 'text-gray-400'}`}>
-                            <div className={`w-8 h-8 rounded-full flex items-center justify-center ${currentStep === 1 ? 'bg-blue-600 text-white' : 'bg-gray-200'
-                                }`}>
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center ${currentStep === 1 ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}>
                                 1
                             </div>
-                            <span className="ml-2 font-medium">Select Package</span>
+                            <span className="ml-2 font-medium">Select Services</span>
                         </div>
                         <ChevronRight className="w-5 h-5 text-gray-400" />
                         <div className={`flex items-center ${currentStep === 2 ? 'text-blue-600' : 'text-gray-400'}`}>
-                            <div className={`w-8 h-8 rounded-full flex items-center justify-center ${currentStep === 2 ? 'bg-blue-600 text-white' : 'bg-gray-200'
-                                }`}>
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center ${currentStep === 2 ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}>
                                 2
                             </div>
                             <span className="ml-2 font-medium">Contact Info</span>
                         </div>
                         <ChevronRight className="w-5 h-5 text-gray-400" />
                         <div className={`flex items-center ${currentStep === 3 ? 'text-blue-600' : 'text-gray-400'}`}>
-                            <div className={`w-8 h-8 rounded-full flex items-center justify-center ${currentStep === 3 ? 'bg-blue-600 text-white' : 'bg-gray-200'
-                                }`}>
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center ${currentStep === 3 ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}>
                                 3
                             </div>
                             <span className="ml-2 font-medium">Review & Submit</span>
@@ -378,90 +291,170 @@ export default function ServiceSelector() {
                     </div>
                 </div>
 
-                {/* Step 1: Package Selection */}
+                {/* Step 1: Service Selection */}
                 {currentStep === 1 && (
                     <div className="space-y-8">
-                        {/* Pre-built Packages */}
-                        <div>
-                            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-                                Pre-Built Packages
-                            </h2>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                {PRESET_PACKAGES.map((pkg) => (
-                                    <Card key={pkg.id} className={`relative cursor-pointer hover:shadow-lg transition-shadow ${pkg.popular ? 'ring-2 ring-blue-500' : ''
-                                        }`}>
-                                        {pkg.popular && (
-                                            <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                                                <Badge className="bg-blue-500 text-white">Most Popular</Badge>
-                                            </div>
-                                        )}
-                                        <CardHeader className="text-center">
-                                            <div className={`inline-flex items-center justify-center w-12 h-12 rounded-lg ${pkg.gradient} mb-4`}>
-                                                <Star className="w-6 h-6 text-white" />
-                                            </div>
-                                            <CardTitle className="text-xl">{pkg.name}</CardTitle>
-                                            <CardDescription>{pkg.description}</CardDescription>
-                                        </CardHeader>
-                                        <CardContent className="space-y-4">
-                                            <div className="text-center">
-                                                <div className="text-3xl font-bold text-blue-600">
-                                                    {formatPrice(pkg.price.oneTime)}
-                                                </div>
-                                                <div className="text-sm text-gray-500">
-                                                    + {formatPrice(pkg.price.recurring)}/month
-                                                </div>
-                                            </div>
-
-                                            <div className="space-y-2">
-                                                <h4 className="font-semibold text-sm text-gray-900 dark:text-white">
-                                                    Includes:
-                                                </h4>
-                                                {pkg.features.map((feature, index) => (
-                                                    <div key={index} className="flex items-center text-sm text-gray-600">
-                                                        <Check className="w-4 h-4 text-green-500 mr-2" />
-                                                        {feature}
-                                                    </div>
-                                                ))}
-                                                {pkg.addOns.map((addOn, index) => (
-                                                    <div key={index} className="flex items-center text-sm text-gray-500">
-                                                        <Star className="w-4 h-4 text-orange-400 mr-2" />
-                                                        <span className="italic">Recommended: {addOn}</span>
-                                                    </div>
-                                                ))}
-                                            </div>
-
-                                            <Button
-                                                onClick={() => selectPackage(pkg.id)}
-                                                className="w-full"
-                                                variant={pkg.popular ? 'default' : 'outline'}
-                                            >
-                                                Select {pkg.name}
-                                                <ChevronRight className="w-4 h-4 ml-2" />
-                                            </Button>
-                                        </CardContent>
-                                    </Card>
+                        {/* Category Tabs */}
+                        {categories.length > 1 && (
+                            <div className="flex flex-wrap gap-2 justify-center mb-6">
+                                <Button
+                                    variant={selectedCategory === null ? 'default' : 'outline'}
+                                    onClick={() => setSelectedCategory(null)}
+                                >
+                                    All Services
+                                </Button>
+                                {categories.map((category) => (
+                                    <Button
+                                        key={category.id}
+                                        variant={selectedCategory === category.name ? 'default' : 'outline'}
+                                        onClick={() => setSelectedCategory(category.name)}
+                                    >
+                                        {getCategoryIcon(category.name)}
+                                        <span className="ml-2">{category.name}</span>
+                                    </Button>
                                 ))}
                             </div>
-                        </div>
+                        )}
 
-                        {/* Custom Package Option */}
-                        <div className="text-center">
-                            <Separator className="my-8" />
-                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                                Need Something Custom?
-                            </h3>
-                            <p className="text-gray-600 dark:text-gray-400 mb-6">
-                                Build your own package with our interactive pricing calculator
-                            </p>
-                            <Button
-                                onClick={() => setCurrentStep(2)} // Move to contact info step
-                                variant="outline"
-                                size="lg"
-                            >
-                                <Search className="w-5 h-5 mr-2" />
-                                Build Custom Package
-                            </Button>
-                        </div>
+                        {/* Services by Category */}
+                        {Object.entries(servicesByCategory).map(([categoryName, { category, services: categoryServices }]) => {
+                            // Filter by selected category
+                            if (selectedCategory !== null && categoryName !== selectedCategory) {
+                                return null
+                            }
+
+                            return (
+                                <div key={categoryName} className="space-y-4">
+                                    <div className="flex items-center gap-3 mb-4">
+                                        {getCategoryIcon(categoryName)}
+                                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                                            {categoryName}
+                                        </h2>
+                                    </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                        {categoryServices.map((service) => {
+                                            const isSelected = isServiceSelected(service.id)
+                                            const selectedService = getSelectedService(service.id)
+                                            const features = Array.isArray(service.features) ? service.features as string[] : []
+
+                                            return (
+                                                <Card
+                                                    key={service.id}
+                                                    className={`relative cursor-pointer hover:shadow-lg transition-shadow ${isSelected ? 'ring-2 ring-blue-500' : ''}`}
+                                                >
+                                                    {isSelected && (
+                                                        <div className="absolute -top-3 right-3">
+                                                            <Badge className="bg-blue-500 text-white">Selected</Badge>
+                                                        </div>
+                                                    )}
+                                                    <CardHeader>
+                                                        <CardTitle className="text-xl">{service.name}</CardTitle>
+                                                        <CardDescription>{service.description}</CardDescription>
+                                                    </CardHeader>
+                                                    <CardContent className="space-y-4">
+                                                        <div className="text-center">
+                                                            <div className="text-3xl font-bold text-blue-600">
+                                                                {formatPrice(service.basePrice)}
+                                                            </div>
+                                                            {service.priceType === 'RECURRING' && service.billingInterval && (
+                                                                <div className="text-sm text-gray-500">
+                                                                    per {service.billingInterval}
+                                                                </div>
+                                                            )}
+                                                            {service.priceType === 'ONE_TIME' && (
+                                                                <div className="text-sm text-gray-500">
+                                                                    one-time
+                                                                </div>
+                                                            )}
+                                                        </div>
+
+                                                        {features.length > 0 && (
+                                                            <div className="space-y-2">
+                                                                <h4 className="font-semibold text-sm text-gray-900 dark:text-white">
+                                                                    Includes:
+                                                                </h4>
+                                                                {features.slice(0, 5).map((feature, index) => (
+                                                                    <div key={index} className="flex items-center text-sm text-gray-600">
+                                                                        <Check className="w-4 h-4 text-green-500 mr-2 flex-shrink-0" />
+                                                                        <span>{feature}</span>
+                                                                    </div>
+                                                                ))}
+                                                                {features.length > 5 && (
+                                                                    <div className="text-xs text-gray-500">
+                                                                        +{features.length - 5} more features
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        )}
+
+                                                        <Button
+                                                            onClick={() => selectService(service)}
+                                                            className="w-full"
+                                                            variant={isSelected ? 'default' : 'outline'}
+                                                        >
+                                                            {isSelected ? 'Deselect' : 'Select Service'}
+                                                            <ChevronRight className="w-4 h-4 ml-2" />
+                                                        </Button>
+
+                                                        {/* Show Add-ons if service is selected */}
+                                                        {isSelected && service.addOns.length > 0 && (
+                                                            <div className="mt-4 pt-4 border-t">
+                                                                <h4 className="font-semibold text-sm text-gray-900 dark:text-white mb-2">
+                                                                    Available Add-ons:
+                                                                </h4>
+                                                                <div className="space-y-2">
+                                                                    {service.addOns.map((addOn) => {
+                                                                        const addOnIsSelected = isAddOnSelected(service.id, addOn.id)
+                                                                        const addOnPrice = addOn.priceType === 'FIXED'
+                                                                            ? (addOn.price || 0)
+                                                                            : Math.round(service.basePrice * (addOn.percentage || 0) / 100)
+
+                                                                        return (
+                                                                            <div
+                                                                                key={addOn.id}
+                                                                                className={`flex items-center justify-between p-2 rounded border cursor-pointer transition-colors ${addOnIsSelected
+                                                                                    ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-500'
+                                                                                    : 'border-gray-200 dark:border-gray-700 hover:border-blue-300'
+                                                                                    }`}
+                                                                                onClick={() => toggleAddOn(service.id, addOn)}
+                                                                            >
+                                                                                <div className="flex-1">
+                                                                                    <div className="font-medium text-sm">{addOn.name}</div>
+                                                                                    <div className="text-xs text-gray-500">{addOn.description}</div>
+                                                                                </div>
+                                                                                <div className="text-sm font-semibold">
+                                                                                    {addOn.priceType === 'PERCENTAGE'
+                                                                                        ? `${addOn.percentage}%`
+                                                                                        : formatPrice(addOnPrice)
+                                                                                    }
+                                                                                </div>
+                                                                            </div>
+                                                                        )
+                                                                    })}
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                    </CardContent>
+                                                </Card>
+                                            )
+                                        })}
+                                    </div>
+                                </div>
+                            )
+                        })}
+
+                        {/* Continue Button */}
+                        {selectedServices.length > 0 && (
+                            <div className="text-center pt-6">
+                                <Button
+                                    onClick={() => setCurrentStep(2)}
+                                    size="lg"
+                                >
+                                    Continue with {selectedServices.length} {selectedServices.length === 1 ? 'Service' : 'Services'}
+                                    <ChevronRight className="w-4 h-4 ml-2" />
+                                </Button>
+                            </div>
+                        )}
                     </div>
                 )}
 
@@ -548,13 +541,13 @@ export default function ServiceSelector() {
 
                                 <div className="flex justify-between pt-4">
                                     <Button
-                                        onClick={() => setCurrentStep(1)} // Back to package selection
+                                        onClick={() => setCurrentStep(1)}
                                         variant="outline"
                                     >
-                                        Back to Packages
+                                        Back to Services
                                     </Button>
                                     <Button
-                                        onClick={() => setCurrentStep(3)} // Move to review step
+                                        onClick={() => setCurrentStep(3)}
                                         disabled={!contactInfo.name || !contactInfo.email}
                                     >
                                         Review Quote
@@ -579,13 +572,13 @@ export default function ServiceSelector() {
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent className="space-y-4">
-                                    {quote.breakdown.services.map(({ service, price, addOns }: ServiceBreakdown) => (
+                                    {quote.breakdown.services.map(({ service, price, addOns }) => (
                                         <div key={service.id} className="space-y-2">
                                             <div className="flex justify-between items-center">
                                                 <span className="font-medium">{service.name}</span>
                                                 <span>{formatPrice(price)}</span>
                                             </div>
-                                            {addOns.map(({ addOn, price: addonPrice }: { addOn: AddOn, price: number }) => (
+                                            {addOns.map(({ addOn, price: addonPrice }) => (
                                                 <div key={addOn.id} className="flex justify-between items-center text-sm text-gray-600 ml-4">
                                                     <span>+ {addOn.name}</span>
                                                     <span>{formatPrice(addonPrice)}</span>
@@ -674,7 +667,7 @@ export default function ServiceSelector() {
                                     </p>
                                     <div className="flex justify-center gap-4">
                                         <Button
-                                            onClick={() => setCurrentStep(2)} // Back to contact info step
+                                            onClick={() => setCurrentStep(2)}
                                             variant="outline"
                                         >
                                             Edit Information
@@ -693,23 +686,7 @@ export default function ServiceSelector() {
                         </Card>
                     </div>
                 )}
-
-                {/* Custom Package Builder (placeholder) */}
-                {currentStep === 2 && (
-                    <div className="text-center py-16">
-                        <Search className="w-16 h-16 mx-auto text-gray-400 mb-4" />
-                        <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-                            Custom Package Builder
-                        </h3>
-                        <p className="text-gray-600 dark:text-gray-400 mb-6">
-                            Advanced pricing calculator will be implemented here
-                        </p>
-                        <Button onClick={() => setCurrentStep(1)}>
-                            Back to Packages
-                        </Button>
-                    </div>
-                )}
             </div>
         </div>
     )
-} 
+}

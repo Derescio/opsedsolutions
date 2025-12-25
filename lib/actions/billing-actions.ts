@@ -1,13 +1,11 @@
 'use server'
 
 import { getCurrentUser, requireAuth } from '@/lib/auth'
-import { PrismaClient } from '@/lib/generated/prisma'
+import { db } from '@/lib/db'
 import { stripe } from '@/lib/stripe'
 import { getBaseUrl } from '@/lib/url-helper'
 // import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
-
-const prisma = new PrismaClient()
 
 // Client Actions
 
@@ -18,7 +16,7 @@ export async function getUserSubscription() {
       throw new Error('Authentication required')
     }
 
-    const subscription = await prisma.subscription.findFirst({
+    const subscription = await db.subscription.findFirst({
       where: { 
         userId: user.id,
         status: { in: ['ACTIVE', 'TRIALING', 'PAST_DUE'] }
@@ -40,7 +38,26 @@ export async function getUserPaymentHistory() {
       throw new Error('Authentication required')
     }
 
-    const payments = await prisma.payment.findMany({
+    // Get project payments (project-related payments)
+    const projectPayments = await db.projectPayment.findMany({
+      where: {
+        project: {
+          userId: user.id
+        }
+      },
+      include: {
+        project: {
+          select: {
+            id: true,
+            name: true
+          }
+        }
+      },
+      orderBy: { createdAt: 'desc' }
+    })
+
+    // Get general payments (non-project payments like one-time subscriptions)
+    const generalPayments = await db.payment.findMany({
       where: { userId: user.id },
       include: {
         subscription: true,
@@ -48,6 +65,59 @@ export async function getUserPaymentHistory() {
       },
       orderBy: { createdAt: 'desc' }
     })
+
+    // Get paid invoices (subscription payments are tracked via invoices)
+    const paidInvoices = await db.invoice.findMany({
+      where: {
+        userId: user.id,
+        status: 'PAID',
+        paidAt: { not: null }
+      },
+      include: {
+        subscription: {
+          select: {
+            id: true,
+            status: true
+          }
+        }
+      },
+      orderBy: { paidAt: 'desc' }
+    })
+
+    // Combine and format payments for display
+    const payments = [
+      ...projectPayments.map(p => ({
+        id: p.id,
+        amount: p.amount,
+        currency: p.currency,
+        status: p.status,
+        type: 'PROJECT' as const,
+        description: p.description || `Payment for ${p.project.name}`,
+        receiptUrl: p.receiptUrl,
+        createdAt: p.createdAt
+      })),
+      ...generalPayments.map(p => ({
+        id: p.id,
+        amount: p.amount,
+        currency: p.currency,
+        status: p.status,
+        type: p.type,
+        description: p.description,
+        receiptUrl: p.receiptUrl,
+        createdAt: p.createdAt
+      })),
+      // Include paid invoices as payment history (for subscription payments)
+      ...paidInvoices.map(inv => ({
+        id: inv.id,
+        amount: inv.total,
+        currency: inv.currency,
+        status: 'SUCCEEDED',
+        type: inv.subscriptionId ? 'SUBSCRIPTION' as const : 'INVOICE' as const,
+        description: inv.description || `Invoice ${inv.number}`,
+        receiptUrl: inv.pdfUrl || inv.invoiceUrl,
+        createdAt: inv.paidAt || inv.invoiceDate
+      }))
+    ].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
 
     return { success: true, payments }
   } catch (error) {
@@ -63,7 +133,7 @@ export async function getUserInvoices() {
       throw new Error('Authentication required')
     }
 
-    const invoices = await prisma.invoice.findMany({
+    const invoices = await db.invoice.findMany({
       where: { userId: user.id },
       include: {
         subscription: true,
@@ -101,7 +171,7 @@ export async function createCheckoutSession(priceId: string) {
       customerId = customer.id
       
       // Update user with customer ID
-      await prisma.user.update({
+      await db.user.update({
         where: { id: user.id },
         data: { stripeCustomerId: customerId }
       })
@@ -165,7 +235,7 @@ export async function cancelSubscription(subscriptionId: string) {
     }
 
     // Verify user owns this subscription
-    const subscription = await prisma.subscription.findFirst({
+    const subscription = await db.subscription.findFirst({
       where: {
         id: subscriptionId,
         userId: user.id
@@ -182,7 +252,7 @@ export async function cancelSubscription(subscriptionId: string) {
     })
 
     // Update database
-    await prisma.subscription.update({
+    await db.subscription.update({
       where: { id: subscriptionId },
       data: { cancelAtPeriodEnd: true }
     })
@@ -201,7 +271,7 @@ export async function getAllSubscriptions() {
   try {
     await requireAuth()
     
-    const subscriptions = await prisma.subscription.findMany({
+    const subscriptions = await db.subscription.findMany({
       include: {
         user: {
           select: {
@@ -226,7 +296,27 @@ export async function getAllPayments() {
   try {
     await requireAuth()
     
-    const payments = await prisma.payment.findMany({
+    // Get project payments with user info
+    const projectPayments = await db.projectPayment.findMany({
+      include: {
+        project: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                email: true,
+                firstName: true,
+                lastName: true
+              }
+            }
+          }
+        }
+      },
+      orderBy: { createdAt: 'desc' }
+    })
+
+    // Get general payments
+    const generalPayments = await db.payment.findMany({
       include: {
         user: {
           select: {
@@ -241,6 +331,32 @@ export async function getAllPayments() {
       orderBy: { createdAt: 'desc' }
     })
 
+    // Combine and format payments
+    const payments = [
+      ...projectPayments.map(p => ({
+        id: p.id,
+        amount: p.amount,
+        currency: p.currency,
+        status: p.status,
+        type: 'PROJECT' as const,
+        description: p.description || `Payment for ${p.project.name}`,
+        receiptUrl: p.receiptUrl,
+        createdAt: p.createdAt,
+        user: p.project.user
+      })),
+      ...generalPayments.map(p => ({
+        id: p.id,
+        amount: p.amount,
+        currency: p.currency,
+        status: p.status,
+        type: p.type,
+        description: p.description,
+        receiptUrl: p.receiptUrl,
+        createdAt: p.createdAt,
+        user: p.user
+      }))
+    ].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+
     return { success: true, payments }
   } catch (error) {
     console.error('Error fetching all payments:', error)
@@ -253,20 +369,39 @@ export async function getBillingAnalytics() {
     await requireAuth()
     
     // Get subscription stats
-    const subscriptionStats = await prisma.subscription.groupBy({
+    const subscriptionStats = await db.subscription.groupBy({
       by: ['status'],
       _count: { id: true }
     })
 
-    // Get payment stats
-    const paymentStats = await prisma.payment.groupBy({
+    // Get payment stats from project payments
+    const projectPaymentStats = await db.projectPayment.groupBy({
       by: ['status'],
       _count: { id: true },
       _sum: { amount: true }
     })
 
-    // Get monthly revenue (last 12 months)
-    const monthlyRevenue = await prisma.payment.findMany({
+    // Get payment stats from general payments
+    const generalPaymentStats = await db.payment.groupBy({
+      by: ['status'],
+      _count: { id: true },
+      _sum: { amount: true }
+    })
+
+    // Combine payment stats
+    const paymentStats = [...projectPaymentStats, ...generalPaymentStats].reduce((acc, stat) => {
+      const existing = acc.find(s => s.status === stat.status)
+      if (existing) {
+        existing._count.id += stat._count.id
+        existing._sum.amount = (existing._sum.amount || 0) + (stat._sum.amount || 0)
+      } else {
+        acc.push(stat)
+      }
+      return acc
+    }, [] as typeof projectPaymentStats)
+
+    // Get monthly revenue from project payments (last 12 months)
+    const projectMonthlyRevenue = await db.projectPayment.findMany({
       where: {
         status: 'SUCCEEDED',
         createdAt: {
@@ -279,8 +414,23 @@ export async function getBillingAnalytics() {
       }
     })
 
-    // Group by month
-    const revenueByMonth = monthlyRevenue.reduce((acc, payment) => {
+    // Get monthly revenue from general payments (last 12 months)
+    const generalMonthlyRevenue = await db.payment.findMany({
+      where: {
+        status: 'SUCCEEDED',
+        createdAt: {
+          gte: new Date(new Date().setFullYear(new Date().getFullYear() - 1))
+        }
+      },
+      select: {
+        amount: true,
+        createdAt: true
+      }
+    })
+
+    // Combine and group by month
+    const allMonthlyRevenue = [...projectMonthlyRevenue, ...generalMonthlyRevenue]
+    const revenueByMonth = allMonthlyRevenue.reduce((acc, payment) => {
       const month = payment.createdAt.toISOString().slice(0, 7) // YYYY-MM format
       if (!acc[month]) {
         acc[month] = 0
@@ -289,11 +439,18 @@ export async function getBillingAnalytics() {
       return acc
     }, {} as Record<string, number>)
 
-    // Get total revenue
-    const totalRevenue = await prisma.payment.aggregate({
+    // Get total revenue from both sources
+    const projectTotalRevenue = await db.projectPayment.aggregate({
       where: { status: 'SUCCEEDED' },
       _sum: { amount: true }
     })
+
+    const generalTotalRevenue = await db.payment.aggregate({
+      where: { status: 'SUCCEEDED' },
+      _sum: { amount: true }
+    })
+
+    const totalRevenue = (projectTotalRevenue._sum.amount || 0) + (generalTotalRevenue._sum.amount || 0)
 
     return {
       success: true,
@@ -301,7 +458,7 @@ export async function getBillingAnalytics() {
         subscriptionStats,
         paymentStats,
         revenueByMonth,
-        totalRevenue: totalRevenue._sum.amount || 0
+        totalRevenue
       }
     }
   } catch (error) {
@@ -314,8 +471,28 @@ export async function getRecentActivity() {
   try {
     await requireAuth()
     
-    // Get recent payments
-    const recentPayments = await prisma.payment.findMany({
+    // Get recent project payments
+    const recentProjectPayments = await db.projectPayment.findMany({
+      include: {
+        project: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                email: true,
+                firstName: true,
+                lastName: true
+              }
+            }
+          }
+        }
+      },
+      orderBy: { createdAt: 'desc' },
+      take: 10
+    })
+
+    // Get recent general payments
+    const recentGeneralPayments = await db.payment.findMany({
       include: {
         user: {
           select: {
@@ -330,8 +507,22 @@ export async function getRecentActivity() {
       take: 10
     })
 
+    // Combine and format payments
+    const allPayments = [
+      ...recentProjectPayments.map(p => ({
+        id: p.id,
+        amount: p.amount,
+        currency: p.currency,
+        status: p.status,
+        createdAt: p.createdAt,
+        user: p.project.user
+      })),
+      ...recentGeneralPayments
+    ].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .slice(0, 10)
+
     // Get recent subscriptions
-    const recentSubscriptions = await prisma.subscription.findMany({
+    const recentSubscriptions = await db.subscription.findMany({
       include: {
         user: {
           select: {
@@ -349,7 +540,7 @@ export async function getRecentActivity() {
     return {
       success: true,
       activity: {
-        payments: recentPayments,
+        payments: allPayments,
         subscriptions: recentSubscriptions
       }
     }
@@ -363,7 +554,7 @@ export async function updateSubscriptionStatus(subscriptionId: string, action: '
   try {
     await requireAuth()
     
-    const subscription = await prisma.subscription.findUnique({
+    const subscription = await db.subscription.findUnique({
       where: { id: subscriptionId }
     })
 

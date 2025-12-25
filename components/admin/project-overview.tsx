@@ -67,6 +67,11 @@ interface Project {
             }
         }
     }[]
+    addOns: {
+        addOn: {
+            name: string
+        }
+    }[]
 }
 
 interface RecentActivity {
@@ -455,16 +460,16 @@ export default function ProjectOverview() {
 
                                             <div className="mt-3">
                                                 <div className="flex flex-wrap gap-2">
-                                                    {project.services.slice(0, 3).map((projectService, index) => (
-                                                        <Badge key={index} variant="outline" className="text-xs">
+                                                    {project.services.map((projectService, index) => (
+                                                        <Badge key={`service-${index}`} variant="outline" className="text-xs">
                                                             {projectService.service.name}
                                                         </Badge>
                                                     ))}
-                                                    {project.services.length > 3 && (
-                                                        <Badge variant="outline" className="text-xs">
-                                                            +{project.services.length - 3} more
+                                                    {project.addOns && project.addOns.map((projectAddOn, index) => (
+                                                        <Badge key={`addon-${index}`} variant="outline" className="text-xs bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border-blue-300">
+                                                            + {projectAddOn.addOn.name}
                                                         </Badge>
-                                                    )}
+                                                    ))}
                                                 </div>
                                             </div>
                                         </div>
@@ -614,12 +619,18 @@ export default function ProjectOverview() {
                             </div>
 
                             <div>
-                                <h4 className="font-semibold mb-4">Services</h4>
+                                <h4 className="font-semibold mb-4">Services & Add-ons</h4>
                                 <div className="space-y-2">
                                     {selectedProject.services.map((service, index) => (
-                                        <div key={index} className="p-2 bg-gray-50 dark:bg-gray-700 rounded">
-                                            <span className="text-sm">{service.service.name}</span>
+                                        <div key={`service-${index}`} className="p-2 bg-gray-50 dark:bg-gray-700 rounded">
+                                            <span className="text-sm font-medium">{service.service.name}</span>
                                             <div className="text-xs text-gray-500">{service.service.category.name}</div>
+                                        </div>
+                                    ))}
+                                    {selectedProject.addOns && selectedProject.addOns.map((addOn, index) => (
+                                        <div key={`addon-${index}`} className="p-2 bg-blue-50 dark:bg-blue-900/20 rounded border border-blue-200 dark:border-blue-800">
+                                            <span className="text-sm font-medium">+ {addOn.addOn.name}</span>
+                                            <div className="text-xs text-gray-500">Add-on</div>
                                         </div>
                                     ))}
                                 </div>

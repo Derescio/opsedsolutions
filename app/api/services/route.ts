@@ -7,7 +7,7 @@ export async function GET() {
     
     // Test database connection first
     await db.$connect()
-    console.log('Database connected successfully')
+   // console.log('Database connected successfully')
     
     const services = await db.service.findMany({
       where: { isActive: true },
@@ -36,7 +36,8 @@ export async function GET() {
       }
     })
 
-    console.log(`Found ${services.length} services`)
+    //console.log(`Found ${services.length} services`)
+    
     return NextResponse.json({
       success: true,
       services: services,

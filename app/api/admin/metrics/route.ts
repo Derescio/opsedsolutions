@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server'
 import { getCurrentUser } from '@/lib/auth'
-import { PrismaClient } from '@/lib/generated/prisma'
-
-const prisma = new PrismaClient()
+import { db } from '@/lib/db'
 
 // TypeScript interfaces for project metadata
 interface CustomerInfo {
@@ -28,10 +26,10 @@ export async function GET() {
     }
 
     // Get total projects
-    const totalProjects = await prisma.project.count()
+    const totalProjects = await db.project.count()
 
     // Get active projects
-    const activeProjects = await prisma.project.count({
+    const activeProjects = await db.project.count({
       where: {
         status: {
           in: ['QUOTE_SENT', 'QUOTE_APPROVED', 'IN_PROGRESS']
@@ -39,8 +37,8 @@ export async function GET() {
       }
     })
 
-    // Get total revenue from payments
-    const totalRevenue = await prisma.payment.aggregate({
+    // Get total revenue from project payments (not general payments)
+    const totalRevenue = await db.projectPayment.aggregate({
       _sum: {
         amount: true
       },
@@ -49,13 +47,13 @@ export async function GET() {
       }
     })
 
-    // Get monthly revenue (last 12 months)
-    const monthlyRevenue = await prisma.$queryRaw`
+    // Get monthly revenue from project payments (last 12 months)
+    const monthlyRevenue = await db.$queryRaw`
       SELECT 
         EXTRACT(YEAR FROM created_at) as year,
         EXTRACT(MONTH FROM created_at) as month,
         SUM(amount) as revenue
-      FROM payments 
+      FROM project_payments 
       WHERE status = 'SUCCEEDED' 
         AND created_at >= NOW() - INTERVAL '12 months'
       GROUP BY EXTRACT(YEAR FROM created_at), EXTRACT(MONTH FROM created_at)
@@ -63,7 +61,7 @@ export async function GET() {
     `
 
     // Get recent activity (last 10 projects with status changes)
-    const recentProjects = await prisma.project.findMany({
+    const recentProjects = await db.project.findMany({
       take: 10,
       orderBy: { updatedAt: 'desc' },
       include: {
@@ -112,8 +110,8 @@ export async function GET() {
       }
     })
 
-    // Get payment statistics
-    const paymentStats = await prisma.payment.groupBy({
+    // Get payment statistics from project payments
+    const paymentStats = await db.projectPayment.groupBy({
       by: ['status'],
       _count: {
         status: true
@@ -124,7 +122,7 @@ export async function GET() {
     })
 
     // Get service popularity
-    const serviceStats = await prisma.projectService.groupBy({
+    const serviceStats = await db.projectService.groupBy({
       by: ['serviceId'],
       _count: {
         serviceId: true

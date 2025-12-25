@@ -1,5 +1,4 @@
 "use client"
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -65,7 +64,7 @@ const allServices: Service[] = [
     {
         id: "custom-web-apps",
         name: "Custom Website Development",
-        shortDescription: "Scalable, responsive web applications built with modern frameworks.",
+        shortDescription: "Scalable, responsive web applications built with modern frameworks. Perfect for small businesses and startups.",
         description: "Full-stack web applications tailored to your business needs, built with cutting-edge technologies for optimal performance and user experience.",
         category: "Web Development",
         subcategory: "Full-Stack Development",
@@ -130,7 +129,7 @@ const allServices: Service[] = [
     {
         id: "ecommerce-development",
         name: "E-Commerce Solutions",
-        shortDescription: "Complete online stores with payment processing and inventory management",
+        shortDescription: "Complete online store setup with payment processing and inventory management. Essential e-commerce features for small businesses.",
         description: "Comprehensive e-commerce platforms with secure payment processing, inventory management, and customer relationship tools.",
         category: "Web Development",
         subcategory: "E-Commerce",
@@ -138,11 +137,11 @@ const allServices: Service[] = [
         features: ["Product Management", "Payment Processing", "Inventory Tracking", "Order Management", "Customer Accounts", "Analytics Dashboard"],
         technologies: ["Next.js", "Stripe", "PayPal", "Shopify API", "WooCommerce", "Prisma"],
         deliverables: ["E-commerce Platform", "Admin Dashboard", "Payment Integration", "Documentation"],
-        timeline: "6-16 weeks",
+        timeline: "4-6 weeks",
         tiers: [
             {
                 name: "Basic Store",
-                price: "$3,500",
+                price: "$2,500",
                 duration: "6-8 weeks",
                 description: "Essential e-commerce features for small businesses",
                 features: [
@@ -196,7 +195,7 @@ const allServices: Service[] = [
     {
         id: "ui-research-design",
         name: "UI Research and Design",
-        shortDescription: "Rapid UI research, wireframing, and visual design for websites or apps",
+        shortDescription: "Rapid UI research, wireframing, and visual design for websites or apps tailored to your brand and product goals.",
         description: "User-centered design process including research, wireframes, and high-fidelity UI mockups tailored to your brand and product goals.",
         category: "Design",
         subcategory: "UI/UX Design",
@@ -215,7 +214,7 @@ const allServices: Service[] = [
         tiers: [
             {
                 name: "Starter Package",
-                price: "$500",
+                price: "$800",
                 duration: "4–5 days",
                 description: "UI wireframes and basic visual design for small apps or websites",
                 features: [
@@ -293,7 +292,7 @@ const allServices: Service[] = [
         tiers: [
             {
                 name: "Rapid UX Sprint",
-                price: "$500",
+                price: "$800",
                 duration: "4 days",
                 description: "Quick UX analysis and UI concept for early-stage validation",
                 features: [
@@ -345,20 +344,20 @@ const allServices: Service[] = [
     // Data Analytics Services
     {
         id: "business-intelligence",
-        name: "Business Intelligence Dashboards",
+        name: "Data Analytics/BI Services",
         shortDescription: "Interactive dashboards and real-time analytics for data-driven decisions",
         description: "Transform your raw data into actionable insights with custom dashboards, automated reporting, and real-time analytics.",
         category: "Data Analytics",
         subcategory: "Business Intelligence",
         icon: BarChart3,
-        features: ["Real-time Analytics", "Custom Dashboards", "KPI Tracking", "Automated Reports", "Data Visualization", "Predictive Analytics"],
+        features: ["Real-time Analytics", "Custom Dashboards", "KPI Tracking", "Automated Reports for ease of usage", "Data Visualization", "Predictive Analytics"],
         technologies: ["Python", "Tableau", "Power BI", "D3.js", "PostgreSQL", "MongoDB"],
         deliverables: ["Dashboard Platform", "Data Models", "Reports", "Training Materials"],
-        timeline: "6-14 weeks",
+        timeline: "2-4 weeks",
         tiers: [
             {
                 name: "Basic Dashboard",
-                price: "$4,000",
+                price: "$1500",
                 duration: "6-8 weeks",
                 description: "Essential analytics for small to medium businesses",
                 features: [
@@ -374,7 +373,7 @@ const allServices: Service[] = [
             },
             {
                 name: "Advanced Analytics",
-                price: "$8,500",
+                price: "$1,500",
                 duration: "8-12 weeks",
                 description: "Comprehensive analytics with advanced features",
                 popular: true,
@@ -426,7 +425,7 @@ const allServices: Service[] = [
         tiers: [
             {
                 name: "Basic Support",
-                price: "$20/month",
+                price: "$80/month",
                 duration: "Monthly",
                 description: "Essential maintenance for small websites",
                 features: [
@@ -830,7 +829,7 @@ export default function ServicesPage() {
                             </SelectContent>
                         </Select>
 
-                        <Select value={priceRange} onValueChange={setPriceRange}>
+                        {/* <Select value={priceRange} onValueChange={setPriceRange}>
                             <SelectTrigger className="w-40">
                                 <SelectValue placeholder="Price Range" />
                             </SelectTrigger>
@@ -841,7 +840,7 @@ export default function ServicesPage() {
                                 <SelectItem value="over-10k">Over $10,000</SelectItem>
                                 <SelectItem value="custom">Custom Pricing</SelectItem>
                             </SelectContent>
-                        </Select>
+                        </Select> */}
                     </div>
                 </div>
 
