@@ -276,6 +276,16 @@ Create admin interface for managing:
 - [ ] Add rate limiting to API routes
 - [ ] Improve test coverage
 
+### **Deprecation Warnings (To Address):**
+- [ ] **`get-random-values-esm@1.0.2`** - Deprecated, use `crypto.getRandomValues()` instead
+  - **Action**: Update dependency or replace with native `crypto.getRandomValues()`
+  - **Priority**: Low (warning only, not breaking)
+  
+- [ ] **`@sanity/next-loader@1.7.5`** - Deprecated, use `next-sanity/live` instead
+  - **Action**: Migrate from `@sanity/next-loader` to `next-sanity/live`
+  - **Priority**: Medium (should be updated to avoid future compatibility issues)
+  - **Note**: Check if this is a direct dependency or a transitive dependency
+
 ---
 
 ## 🔄 **Workflow Improvements**
